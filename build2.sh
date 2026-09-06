@@ -28,4 +28,5 @@ nasm -g -f macho64 "$ASM_FILE" -o "$OBJECT_FILE"
 /usr/local/opt/llvm/bin/clang -Wl,-no_pie "$OBJECT_FILE" -o "$EXECUTABLE"
 
 # 3. Run the compiled executable
+echo run $EXECUTABLE ":"
 "$EXECUTABLE"
