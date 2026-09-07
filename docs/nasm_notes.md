@@ -14,7 +14,6 @@
 <p>
 
 #### To use relative address in asm files:
-- add "default rel" at the top of each asm file. 
 - Remove -no_pie from build scripts.
 - Use lea for string/data pointers (e.g., lea rsi, [message]) rather than mov rsi, message.
 <p>
@@ -32,6 +31,8 @@ lea rsi, [rel message]   ; Load Effective Address relative to instruction pointe
 mov rax, [rel my_var]    ; Load value relative to instruction pointer
 ```
 </p>
+- add "default rel" at the top of each asm file so you don't have to add `rel` in each command
+
 
 #### System Call Numbers
 - Use macOS system call numbers.
