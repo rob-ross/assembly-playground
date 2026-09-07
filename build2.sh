@@ -2,15 +2,20 @@
 set -e # Exit immediately if any command fails
 
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <base-name>"
-    echo "Example: $0 hello"
+    echo "Usage: $0 <path/base-name>"
+    echo "Example: $0 src/exit"
+    echo "Example: $0 src/chapter1/exit"
     exit 1
 fi
 
-BASE_NAME="$1"
-ASM_FILE="${BASE_NAME}.asm"
+INPUT_PATH="$1"
+ASM_FILE="${INPUT_PATH}.asm"
+
+BASE_NAME="$(basename "$INPUT_PATH")"
 BUILD_ROOT="shell-build"
-BUILD_DIR="${BUILD_ROOT}/${BASE_NAME}"
+OUTPUT_PATH="${INPUT_PATH#src/}"
+
+BUILD_DIR="${BUILD_ROOT}/${OUTPUT_PATH}"
 OBJECT_FILE="${BUILD_DIR}/${BASE_NAME}.o"
 EXECUTABLE="${BUILD_DIR}/${BASE_NAME}"
 

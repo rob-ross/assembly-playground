@@ -12,7 +12,7 @@ set(CMAKE_ASM_NASM_FLAGS "-g -f macho64")
 
 # Add your assembly source file(s)
 add_executable(assembly_playground
-        hello.asm
+        src/hello.asm
 )
 
 # Fix for macOS modern linker warnings regarding command-line entry points
