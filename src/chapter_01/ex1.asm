@@ -12,5 +12,5 @@ segment .text
 global _main
 _main:
     mov eax,0x2000001 ; macos exit syscall number
-    mov edi,0 ; the status value to return
+    mov rdi, 22 ; Exit code (0-255). Only lower 8 bits are read by OS.
     syscall ; execute a system call

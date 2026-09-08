@@ -17,6 +17,8 @@ OUTPUT_PATH="${INPUT_PATH#src/}"
 
 BUILD_DIR="${BUILD_ROOT}/${OUTPUT_PATH}"
 OBJECT_FILE="${BUILD_DIR}/${BASE_NAME}.o"
+LIST_FILE="${BUILD_DIR}/${BASE_NAME}.list"
+
 EXECUTABLE="${BUILD_DIR}/${BASE_NAME}"
 
 if [ ! -f "$ASM_FILE" ]; then
@@ -27,7 +29,7 @@ fi
 mkdir -p "$BUILD_DIR"
 
 # 1. Assemble with debug symbols (-g) to a macOS 64-bit Mach-O object file
-nasm -g -f macho64 "$ASM_FILE" -o "$OBJECT_FILE"
+nasm -g -f macho64 "$ASM_FILE" -o "$OBJECT_FILE" -l "$LIST_FILE"
 
 # 2. Link using Homebrew Clang, passing -no_pie via -Wl
 /usr/local/opt/llvm/bin/clang -Wl,-no_pie "$OBJECT_FILE" -o "$EXECUTABLE"

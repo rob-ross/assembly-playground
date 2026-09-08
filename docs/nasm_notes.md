@@ -31,7 +31,9 @@ lea rsi, [rel message]   ; Load Effective Address relative to instruction pointe
 mov rax, [rel my_var]    ; Load value relative to instruction pointer
 ```
 </p>
+
 - add "default rel" at the top of each asm file so you don't have to add `rel` in each command
+- System Call Convention: macOS System V ABI prefers using the full 64-bit rdi register for system call arguments.
 
 
 #### System Call Numbers
@@ -45,4 +47,30 @@ mov rax, [rel my_var]    ; Load value relative to instruction pointer
 
 - "end" directive at the end of asm
 
+---
 
+## Registers
+| Register Name | Size      | Description              |                                               |
+|---------------|-----------|--------------------------|-----------------------------------------------|
+| rdi, 64 bits  | (8 bytes) | The full 64-bit register | used as first arg to function or system call  |
+| edi, 32 bits  | (4 bytes) | The lower 32 bits of rdi | used as first arg to function or system call  |
+| di,  16 bits  | (2 bytes) | The lower 16 bits of edi |                                               |
+| dil,  8 bits  | (1 byte)  | The lower 8 bits of di   |                                               |
+
+---
+In original 16-bit x86 assembly, registers had specific hardware roles:
+- si (Source Index): Pointed to the memory location you were reading from.
+- di (Destination Index): Pointed to the memory location you were writing to.
+
+They were primarily designed for string/memory manipulation instructions like movsb (Move String Byte) or 
+stosb (Store String Byte), where rsi/ds:si served as the source pointer and rdi/es:di served as the destination pointer.
+---
+| Register | Full Name                                | Architecture    | Size      | Era  |
+|----------|------------------------------------------|-----------------|-----------|------|
+| di       | Destination Index                        | 16-bit (8086)   | 16 bits   | 1978 |
+| edi      | Extended Destination Index               | 32-bit (80386)  | 32 bits   | 1985 |
+| rdi      | Register (or 64-bit) Destination Index   | 64-bit (x86-64) | 64 bits   | 2003 |
+
+### Debugging
+- in lldb enter `regist read` to see general purpose registers
+- or enter specific registers, e.g., register read rax rbx rcx rdx rbp rsp rip

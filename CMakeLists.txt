@@ -8,14 +8,21 @@ project(assembly_playground C ASM_NASM)
 set(CMAKE_ASM_NASM_OBJECT_FORMAT macho64)
 
 # Set global flags for NASM (e.g., enable dwarf debug symbols)
-set(CMAKE_ASM_NASM_FLAGS "-g -f macho64")
+set(CMAKE_ASM_NASM_FLAGS "-g -F dwarf -f macho64")
 
 # Add your assembly source file(s)
 add_executable(assembly_playground
-        src/hello.asm
+        #src/hello.asm
+        #src/chapter_03/memory.asm
+        #src/hello3.asm
+        src/test_print.asm
+
 )
+
+set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
+
 
 # Fix for macOS modern linker warnings regarding command-line entry points
 # PIE stands for Position-Independent Executable.
 # RIP - (register?) current Instruction Pointer
-target_link_options(assembly_playground PRIVATE -no_pie)
+#target_link_options(assembly_playground PRIVATE -no_pie)

@@ -1,0 +1,149 @@
+Linux/YASM tutorial       macOS/NASM equivalent
+------------------------------------------------
+-f elf64                  -f macho64
+main                      _main in source
+printf                    _printf in source
+yasm                      nasm
+ld directly               clang or CMake C linker
+syscall numbers           macOS syscall numbers
+gdb/ebe                   lldb/CLion
+
+
+x86 registers:
+
+rdi : 8 bytes, destination index
+rsi : 8 bytes, source index
+
+rax : 8 bytes (64 bits), general purpose
+
+rsp : 8 bytes, stack pointer, holds address of the top of stack (stack grows down)
+rbp : 8 bytes, stack base pointer
+
+edi ; lower 4 bytes (32 bits) of rdi
+esi ; lower 4 bytes (32 bits) of rsi
+
+di  ; lower 2 bytes (16 bit) of rdi
+si  ; lower 2 bytes (16 bit) of rds
+
+
+rax :  64 bits  ; signed / unsigned long ( r = really extended)
+eax :  32 bits  ; signed / unsigned int  ( e = extended)
+ax  :  16 bits  ; signed / unsigned short
+ah  :  ax high byte ; signed / unsigned byte
+al  :  ax low byte  ; signed / unsigned byte
+
+8 byte (64 bit) registers:
+AX,   BX,  CX,  DX
+EAX, EBX, ECX, EDX,
+RAX, RBX, RCX, RDX
+
+RAX EAX AX AH AL - Mathematical operations, i.e. division, multiplication
+RCX ECX CX CH CL - counting, loops, bit shifting
+RDX EDS DX DH DL - data i/o in and out instructions (kernel level) , writing to hardware
+RBX EBX BX BH BL - expects a calling convention where we push and pop
+
+Stack pointer
+RSP (8 bytes), ESP (4 bytes), and SP (16 bytes). No SH nor SL
+Pointes to anywhere in memory
+push instruction called decrements by one "word"
+pop increments by one "word"
+
+RBP (8 bytes), EBP (4 bytes), BP (2 bytes)
+Points to old stack pointer
+can also relatively address on the stack
+
+RDI (8 bytes), EDI (4 bytes) DI (2 bytes)
+used for string or data copying instructions for output
+
+RSI (8 bytes), ESI (4 bytes), SI (2 bytes)
+used for string or data copying instructions for input
+
+
+size modifiers:
+qword   : quad word, 8 bytes (64 bits)
+dword   : double word, 4 bytes (32 bits)
+word    : 2 bytes (16 bits)
+byte    : 1 byte (8 bits)
+
+Operations:
+
+add : adds the operands and places the result in the first register
+    add rdi, rsi   ; add the values in rdi and rsi together and place result in rdi
+    add rdi, qword ptr [rsp - 8]  ; add rdi to the value at the computed address, store result in rdi
+
+cmp : compare two values by subtracting the second op from the first. The result of comparison written to a flag in cpu
+    cmp op1, op2    ;  op1 - op2
+                    ;  if equal, expression is 0, zero flag is set
+                    ;  if op2 > op1, expression is negative, sign bit is set
+                    ;
+    cmp rdi, rsi    ;
+
+inc : increment register
+    inc rsi ; adds 1 to the value in rsi and stores in rsi
+
+jg  : jump if greater. evaluates result of last cmp, if first operand was > second operand, makes the jump
+    jg .greater ; jump to label .greater
+
+jmp : unconditional jump to a label
+
+lea : load effective address
+    lea rdi, [rsp-8]    ; calculate a memory address as offset from rsp
+                        ; copy that address into register rdi
+
+
+leave :  restores rsp and rbp. copies rbp into rsp, pop rbp.
+
+
+mov : copies data. only 1 operand can be memory.
+    mov rdi, 2     ; move immediate value 2 into the rdi register
+    mov rdi, 0xfedc_ ; move immediate value (address) into rdi register
+    mov qword ptr [rsp - 8], rsi  ; [rsp - 8] is a computed expression
+                                  ; `qword ptr` dereferences the int expression value to obtain an address
+                                  ; copy value from rsi to the evaluated memory address
+
+
+
+push : push register value onto stack
+    push rdi  ; push value of rdi register to top of stack, given by rsp stack pointer
+              ; rdi is 8 byte register, so 8 bytes are written to stack.
+              ; LE means lsb of register value is written first.
+              ; rsp stack pointer is also decremented by 8 bytes
+
+pop : pop value at top of stack into the given register
+    pop rsi     ;  copies 8 bytes from top of stack into rsi (low address to high address)
+                ;  stack pointer rsp is incremented by 8 bytes
+
+
+ret : return from subroutine. Current subroutine must have been invoked with a call instruction
+    ret
+
+
+Jumping :
+    cmp op1, op2
+
+    je  label   ; op1 == op2    ; is zero bit set?
+    jne label   ; op1 != op2
+
+    jl  label   ; op1 <  op2
+    jle label   ; op1 <= op2
+    jg  label   ; op1 >  op2    ; is sign bit set?
+    jge label   ; op1 >= op2
+
+    // unsigned b = "below", a = "above"
+
+    jb  label   ; op1 <  op2
+    jbe label   ; op1 <= op2
+    ja  label   ; op1 >  op2
+    jae label   ; op1 >= op2
+
+Looping:
+    mov rcx, 1
+    mov rax, 0
+ .for
+    cmp rcx, 3
+    je  .endfor
+    add rax, rcx
+    inc rcx
+    jmp .for
+ .endfor
+

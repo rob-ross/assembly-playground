@@ -1,0 +1,45 @@
+canonical list :
+https://github.com/apple-oss-distributions/xnu/blob/main/bsd/kern/syscalls.master
+
+must add 0x200'0000 to the id
+0x2000000
+
+example:
+1 exit  : 0x2000000 + 1 = 0x2000001
+4 write : 0x2000000 + 4 = 0x2000004
+
+Function
+Base number
+macOS x86-64 syscall number
+exit    1   0x2000001
+fork    2   0x2000002
+read    3   0x2000003
+writ    4   0x2000004
+open    5   0x2000005
+close   6   0x2000006
+wait4   7   0x2000007
+link    9   0x2000009
+unlink  10  0x200000a
+chdir   12  0x200000c
+fchdir  13  0x200000d
+mknod   14  0x200000e
+chmod   15  0x200000f
+chown   16  0x2000010
+getpid  20  0x2000014
+
+Argument registers on macOS x86-64 syscall
+For a syscall instruction, the number goes in:
+`rax`
+example:
+mov rax, 0x2000004
+syscall
+
+Arguments generally go in:
+`rdi, rsi, rdx, r10, r8, r9`
+
+Return value comes back in:
+rax
+
+A C library call uses a normal function call:
+extern _printf
+call _printf
