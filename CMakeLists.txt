@@ -15,7 +15,9 @@ add_executable(assembly_playground
         #src/hello.asm
         #src/chapter_03/memory.asm
         #src/hello3.asm
-        src/test_print.asm
+#        src/nibblebits/test_print.asm
+        src/test_registers.asm
+
 
 )
 
