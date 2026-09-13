@@ -17,8 +17,6 @@ add_executable(assembly_playground
         #src/hello3.asm
 #        src/nibblebits/test_print.asm
         src/test_registers.asm
-
-
 )
 
 set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
@@ -28,3 +26,11 @@ set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
 # PIE stands for Position-Independent Executable.
 # RIP - (register?) current Instruction Pointer
 #target_link_options(assembly_playground PRIVATE -no_pie)
+
+
+project(ch02 CXX ASM_NASM)
+add_executable(ch02
+        modern-x86-assembly/chapter_02/Ch02_01.cpp
+        modern-x86-assembly/chapter_02/Ch02_01.asm
+)
+set_target_properties(ch02 PROPERTIES LINKER_LANGUAGE CXX)

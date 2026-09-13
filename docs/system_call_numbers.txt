@@ -43,3 +43,15 @@ rax
 A C library call uses a normal function call:
 extern _printf
 call _printf
+
+
+System V function calling convention: (`call`)
+1. %rdi
+2. %rsi
+3. %rdx
+4. %rcx  <-- Normal 4th argument destination
+5. %r8
+6. %r9
+
+For system calls: (`syscall`)
+4. %r10 ; replace rcx with r10

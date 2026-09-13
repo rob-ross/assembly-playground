@@ -65,6 +65,10 @@ dword   : double word, 4 bytes (32 bits)
 word    : 2 bytes (16 bits)
 byte    : 1 byte (8 bits)
 
+
+Brackets [] indicate a dereference operation
+$ means "current address"
+
 Operations:
 
 add : adds the operands and places the result in the first register
@@ -95,6 +99,7 @@ leave :  restores rsp and rbp. copies rbp into rsp, pop rbp.
 
 
 mov : copies data. only 1 operand can be memory.
+    ;  mov instruction is the only instruction that supports 64-bit immediate operands.
     mov rdi, 2     ; move immediate value 2 into the rdi register
     mov rdi, 0xfedc_ ; move immediate value (address) into rdi register
     mov qword ptr [rsp - 8], rsi  ; [rsp - 8] is a computed expression
@@ -102,6 +107,10 @@ mov : copies data. only 1 operand can be memory.
                                   ; copy value from rsi to the evaluated memory address
 
 
+mul : unsigned int multiply.
+    ; multiplies rax and the given operand, stores in rdx:rax.
+    ; Implicitly uses rax as an operand, places result in rdx:rax
+    mul rbx ; equivalent in C to rdx:rax = rax * rbx. Result stored in rax, overflow in rdx
 
 push : push register value onto stack
     push rdi  ; push value of rdi register to top of stack, given by rsp stack pointer
@@ -147,3 +156,40 @@ Looping:
     jmp .for
  .endfor
 
+CPU FEATURES
+
+To view information about an object file use objdump. Ex, show section headers:
+objdump -h <file.o>
+
+To view flags for CPU features:
+sysctl -a | grep machdep.cpu.features
+machdep.cpu.features:
+FPU VME DE PSE TSC MSR PAE MCE CX8 APIC SEP MTRR PGE MCA CMOV PAT PSE36 CLFSH DS ACPI MMX FXSR SSE SSE2 SS HTT TM PBE
+SSE3 PCLMULQDQ DTES64 MON DSCPL VMX EST TM2 SSSE3 FMA CX16 TPR PDCM SSE4.1 SSE4.2 x2APIC MOVBE POPCNT AES PCID XSAVE
+OSXSAVE SEGLIM64 TSCTMR AVX1.0 RDRAND F16C
+
+sysctl machdep.cpu.leaf7_features
+machdep.cpu.leaf7_features:
+RDWRFSGS TSC_THREAD_OFFSET SGX BMI1 HLE AVX2 SMEP BMI2 ERMS INVPCID RTM FPU_CSDS MPX RDSEED ADX SMAP CLFSOPT IPT SGXLC
+MDCLEAR TSXFA IBRS STIBP L1DF ACAPMSR SSBD
+
+sysctl -a | grep hw.optional.avx
+
+hw.optional.avx1_0: 1
+hw.optional.avx2_0: 1
+hw.optional.avx512f: 0
+hw.optional.avx512cd: 0
+hw.optional.avx512dq: 0
+hw.optional.avx512bw: 0
+hw.optional.avx512vl: 0
+hw.optional.avx512ifma: 0
+hw.optional.avx512vbmi: 0
+
+
+memory addressing:
+Up to up to four separate components are needed to specify the location of an operand in memory.
+The four components include a constant displacement value, a base register, an index register, and a scale factor.
+
+EffectiveAddress = BaseReg + IndexReg * ScaleFactor + Disp
+
+see table 1.6 in "X86-64 Core arChiteCture"
