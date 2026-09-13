@@ -1,0 +1,27 @@
+
+1. Adjust registers used in function calls
+
+MS Vs System V calling conventions
+      MS: 1. ECX, 2. EDX, 3. R8D, 4. R9D,               returns in EAX
+System V: 1. EDI, 2. ESI, 3. EDX, 4. ECX, 5. r8, 6. r9  returns in EAX
+
+2. asm function names must start with underscore
+
+IntegerLogical_ -> _IntegerLogical_
+
+3. global decl uses 'global' not 'proc':
+
+IntegerLogical_ proc -> global _IntegerLogical_
+
+4. segments need the `section` keyword.
+
+.data -> section .data
+
+5. use .text instead of .code
+.code -> section .text
+
+6. end is not used in NASM as a directive for end of code
+
+7. in extern declarations for variables, the type is not specified.
+extern g_Val1:dword -> extern _g_Val1
+

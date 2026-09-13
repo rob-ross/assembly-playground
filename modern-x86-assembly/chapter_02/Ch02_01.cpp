@@ -18,6 +18,7 @@ static void PrintResult(const char* msg, int a, int b, int c, int d, int result)
     cout << "result = " << result << nl;
     cout << nl;
 }
+
 int main() {
     int a, b, c, d, result;
     a = 10; b = 20; c = 30; d = 18;

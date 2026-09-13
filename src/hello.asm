@@ -15,5 +15,5 @@ _main:
     syscall
 
 section .data
-message:     db "Hello, 64-bit Assembly in CLion!", 0x0A
-message_len: equ $ - message
+message     db "Hello, 64-bit Assembly in CLion!", 0x0A
+message_len equ $ - message

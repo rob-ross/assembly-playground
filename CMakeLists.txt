@@ -12,11 +12,11 @@ set(CMAKE_ASM_NASM_FLAGS "-g -F dwarf -f macho64")
 
 # Add your assembly source file(s)
 add_executable(assembly_playground
-        #src/hello.asm
+        src/hello.asm
         #src/chapter_03/memory.asm
         #src/hello3.asm
 #        src/nibblebits/test_print.asm
-        src/test_registers.asm
+#        src/test_registers.asm
 )
 
 set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
@@ -28,9 +28,25 @@ set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
 #target_link_options(assembly_playground PRIVATE -no_pie)
 
 
-project(ch02 CXX ASM_NASM)
-add_executable(ch02
+project(ch02_01 CXX ASM_NASM)
+add_executable(ch02_01
         modern-x86-assembly/chapter_02/Ch02_01.cpp
         modern-x86-assembly/chapter_02/Ch02_01.asm
 )
-set_target_properties(ch02 PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(ch02_01 PROPERTIES LINKER_LANGUAGE CXX)
+
+
+project(ch02_02 CXX ASM_NASM)
+add_executable(ch02_02
+        modern-x86-assembly/chapter_02/Ch02_02.cpp
+        modern-x86-assembly/chapter_02/Ch02_02.asm
+)
+set_target_properties(ch02_02 PROPERTIES LINKER_LANGUAGE CXX)
+
+
+project(ch02_03 CXX ASM_NASM)
+add_executable(ch02_03
+        modern-x86-assembly/chapter_02/Ch02_03.cpp
+        modern-x86-assembly/chapter_02/Ch02_03.asm
+)
+set_target_properties(ch02_03 PROPERTIES LINKER_LANGUAGE CXX)
