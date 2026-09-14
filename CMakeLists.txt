@@ -28,40 +28,44 @@ set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
 #target_link_options(assembly_playground PRIVATE -no_pie)
 
 
+######################################################
+#
+# X86-64 Core Programming 3rd Edition projects:
+#
+######################################################
+
 project(ch02_01 CXX ASM_NASM)
 add_executable(ch02_01
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_01.cpp
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_01.asm
+        modern-x86-assembly/ch_02/ch_02_01/Ch02_01.cpp
+        modern-x86-assembly/ch_02/ch_02_01/Ch02_01_misc.cpp
+        modern-x86-assembly/ch_02/ch_02_01/Ch02_01_fasm.asm
 )
 set_target_properties(ch02_01 PROPERTIES LINKER_LANGUAGE CXX)
 
-
 project(ch02_02 CXX ASM_NASM)
 add_executable(ch02_02
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_02.cpp
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_02.asm
+        modern-x86-assembly/ch_02/Ch02_02.cpp
+        modern-x86-assembly/ch_02/Ch02_02.asm
 )
 set_target_properties(ch02_02 PROPERTIES LINKER_LANGUAGE CXX)
 
-
 project(ch02_03 CXX ASM_NASM)
 add_executable(ch02_03
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_03.cpp
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_03.asm
+        modern-x86-assembly/ch_02/Ch02_03.cpp
+        modern-x86-assembly/ch_02/Ch02_03.asm
 )
 set_target_properties(ch02_03 PROPERTIES LINKER_LANGUAGE CXX)
 
 project(ch02_04 CXX ASM_NASM)
 add_executable(ch02_04
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_04.cpp
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_04.asm
+        modern-x86-assembly/ch_02/Ch02_04.cpp
+        modern-x86-assembly/ch_02/Ch02_04.asm
 )
 set_target_properties(ch02_04 PROPERTIES LINKER_LANGUAGE CXX)
 
-
 project(ch02_05 CXX ASM_NASM)
 add_executable(ch02_05
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_05.cpp
-        modern-x86-assembly/chapter_02-2ndEd/Ch02_05.asm
+        modern-x86-assembly/ch_02/Ch02_05.cpp
+        modern-x86-assembly/ch_02/Ch02_05.asm
 )
 set_target_properties(ch02_05 PROPERTIES LINKER_LANGUAGE CXX)
