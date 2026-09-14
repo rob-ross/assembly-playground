@@ -50,3 +50,18 @@ add_executable(ch02_03
         modern-x86-assembly/chapter_02/Ch02_03.asm
 )
 set_target_properties(ch02_03 PROPERTIES LINKER_LANGUAGE CXX)
+
+project(ch02_04 CXX ASM_NASM)
+add_executable(ch02_04
+        modern-x86-assembly/chapter_02/Ch02_04.cpp
+        modern-x86-assembly/chapter_02/Ch02_04.asm
+)
+set_target_properties(ch02_04 PROPERTIES LINKER_LANGUAGE CXX)
+
+
+project(ch02_05 CXX ASM_NASM)
+add_executable(ch02_05
+        modern-x86-assembly/chapter_02/Ch02_05.cpp
+        modern-x86-assembly/chapter_02/Ch02_05.asm
+)
+set_target_properties(ch02_05 PROPERTIES LINKER_LANGUAGE CXX)
