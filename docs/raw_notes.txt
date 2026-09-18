@@ -23,7 +23,7 @@ edi ; lower 4 bytes (32 bits) of rdi
 esi ; lower 4 bytes (32 bits) of rsi
 
 di  ; lower 2 bytes (16 bit) of rdi
-si  ; lower 2 bytes (16 bit) of rds
+si  ; lower 2 bytes (16 bit) of rsi
 
 
 rax :  64 bits  ; signed / unsigned long ( r = really extended)
@@ -191,6 +191,8 @@ memory addressing:
 Up to up to four separate components are needed to specify the location of an operand in memory.
 The four components include a constant displacement value, a base register, an index register, and a scale factor.
 
-EffectiveAddress = BaseReg + IndexReg * ScaleFactor + Disp
+Effective Address = BaseReg + IndexReg * ScaleFactor + Disp
+    ScaleFactor = 1, 2, 4, or 8
+    Disp        = 8-, 16-, or 32-bit signed offset
 
-see table 1.6 in "X86-64 Core arChiteCture"
+see table 1.6 in "X86-64 Core architecture"
