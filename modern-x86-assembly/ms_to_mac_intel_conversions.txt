@@ -5,9 +5,10 @@ MS Vs System V calling conventions
       MS: 1. ECX, 2. EDX, 3. R8D, 4. R9D,               returns in EAX
 System V: 1. EDI, 2. ESI, 3. EDX, 4. ECX, 5. r8, 6. r9  returns in EAX
 
-2. asm function names must start with underscore
+2. asm global/extern function names and variables must start with underscore
 
 IntegerLogical_ -> _IntegerLogical_
+g_NumPrimes_a   -> _g_NumPrimes_a
 
 3. global decl uses 'global' not 'proc':
 
@@ -24,4 +25,11 @@ IntegerLogical_ proc -> global _IntegerLogical_
 
 7. in extern declarations for variables, the type is not specified.
 extern g_Val1:dword -> extern _g_Val1
+
+8. When declaring variable names, they are labels and must end with a colon:
+g_NumPrimes_a ... -> g_NumPrimes_a: ...
+
+9. Section .constant/.rdata is .rodata in mach64
+.const
+section .rdata  -> section .rodata
 

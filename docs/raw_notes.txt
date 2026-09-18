@@ -110,6 +110,7 @@ mov : copies data. only 1 operand can be memory.
 mul : unsigned int multiply.
     ; multiplies rax and the given operand, stores in rdx:rax.
     ; Implicitly uses rax as an operand, places result in rdx:rax
+    ; multiplying two n-bit numbers results in a max product size of 2n
     mul rbx ; equivalent in C to rdx:rax = rax * rbx. Result stored in rax, overflow in rdx
 
 push : push register value onto stack
@@ -127,7 +128,7 @@ ret : return from subroutine. Current subroutine must have been invoked with a c
     ret
 
 
-Jumping :
+Jumping : jcc = jump on condition code
     cmp op1, op2
 
     je  label   ; op1 == op2    ; is zero bit set?

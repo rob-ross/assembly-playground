@@ -60,3 +60,42 @@ For system calls: (`syscall`)
 MS Vs System V calling conventions
       MS: 1. ECX, 2. EDX, 3. R8D, 4. R9D,               returns in EAX
 System V: 1. EDI, 2. ESI, 3. EDX, 4. ECX, 5. r8, 6. r9  returns in EAX
+
+
+1. The x86-64 (Intel/AMD) ABIs
+System V AMD64 ABI (The "Everywhere Else" ABI):
+A. This is the formal name for the standard used by Linux, macOS, FreeBSD, OpenBSD, and Solaris.
+It passes the first 6 arguments in registers (rdi, rsi, rdx, rcx, r8, r9).
+B. Microsoft x64 Calling Convention (The "Windows" ABI):
+Used exclusively by Windows. It passes the first 4 arguments in registers (rcx, rdx, r8, r9) and allocates
+a 32-byte "shadow space" on the stack for every function call, regardless of how many arguments are passed.)
+
+2. The ARM64 (AArch64) ABIsBecause ARM64 powers everything from modern smartphones to Apple Silcon Macs
+and cloud servers, its ABI landscape is more fractured than x86-64:
+
+AAPCS64 (Procedure Call Standard for the Arm 64-bit Architecture):
+This is the base standard defined by ARM. It is heavily utilized by Linux and Android (where the explicit native
+platform target is named arm64-v8a).
+
+Apple ARM64 ABI: Used by macOS, iOS, watchOS, and tvOS. While built on top of ARM's base standard,
+Apple intentionally diverged in a few ways. For instance, Apple’s ABI passes arguments on the stack tightly
+packed (byte-by-byte alignment) rather than padding them out to 8-byte boundaries like the standard AAPCS64.
+
+Windows ARM64 ABI: Windows on ARM devices uses its own flavor of AAPCS64, tailoring register usage
+(like the x18 platform register) to match Windows kernel expectations.
+
+3. The RISC-V 64-bit ABIs (RV64)RISC-V is a modern, rapidly growing open-source architecture that utilizes
+multiple distinct ABIs depending on how the hardware handles math:
+lp64: The base integer ABI where long and pointers are 64-bit, but floating-point math is done entirely
+in software (no hardware float registers).
+lp64f: The standard ABI for chips with single-precision hardware floating-point support.
+lp64d: The most common modern desktop/server RISC-V ABI, designed for chips supporting hardware
+double-precision floating-point.
+
+4. Specialized & Hybrid 64-Bit
+ABIsARM64EC (Emulation Compatible): An ABI introduced by Microsoft for Windows 11 on ARM.
+It modifies the standard ARM64 registry layout and
+stack architecture to precisely mimic the x86-64 Windows ABI. This allows developers to mix native ARM64 code and
+emulated x86-64 code seamlessly inside the exact same software process.
+The x32 ABI: A niche but modern ABI for Linux. It runs on a 64-bit x86-64 CPU and uses 64-bit registers,
+but enforces 32-bit pointers to reduce the memory footprint and maximize CPU cache efficiency.
