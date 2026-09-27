@@ -14,7 +14,8 @@ _CopyArrayI32_a:
 
 ; Copy a[] to b[]
 ; (note: rsi and rdi already contain pointers to a[] and b[])
-
+    mov     rcx, rdx    ; rcx := n
+    rep     movsd       ; copy elements in rsi[] to rdi[]
     ret
 
 ;------------------------------------------------------------------------------
@@ -25,5 +26,7 @@ _FillArrayI64_a:
 
 ; Fill a[] with fill_val
 ; (note: rdi already contains pointer to a[])
-
+    mov     rax, rsi        ; rax := fill value
+    mov     rcx, rdx        ; rcx := n
+    rep     stosq           ; set each element in to fill_val. Fills n(rcx) elements
     ret

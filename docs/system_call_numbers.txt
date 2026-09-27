@@ -61,6 +61,23 @@ MS Vs System V calling conventions
       MS: 1. ECX, 2. EDX, 3. R8D, 4. R9D,               returns in EAX
 System V: 1. EDI, 2. ESI, 3. EDX, 4. ECX, 5. r8, 6. r9  returns in EAX
 
+System V volatile registers:
+volatile: free to be clobbered, caller must save
+rdi, rsi, rax, rcx, rdx, r8-r11
+
+non-volatile: function must not clobber these. I.e., must save and restore these
+rbp, rsp, rbx, r12-r15
+
+MSCV++ registers: same non-volatile as System V but MSVC++ defines rdi and rsi as non-volatile
+
+useful function documentation:
+    Function name
+    Input
+    Output
+    Destroys
+    Calls
+    Description
+    
 
 1. The x86-64 (Intel/AMD) ABIs
 System V AMD64 ABI (The "Everywhere Else" ABI):

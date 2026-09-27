@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.20)
 #cmake_minimum_required(VERSION 4.3.1)
 
 project(assembly_playground C CXX ASM_NASM)
+set(CMAKE_CXX_STANDARD 23)
 
 # Ensure CMake uses 64-bit NASM for macOS Mach-O binaries
 set(CMAKE_ASM_NASM_OBJECT_FORMAT macho64)
 
-# Set global flags for NASM (e.g., enable dwarf debug symbols)
-set(CMAKE_ASM_NASM_FLAGS "-g -F dwarf -f macho64")
+# Set global flags for NASM debug symbols
+set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -g -F dwarf")
+
 
 # Add your assembly source file(s)
 add_executable(assembly_playground
@@ -149,3 +151,54 @@ add_executable(ch04_08
         modern-x86-assembly/ch_04/Ch04_08.asm
 )
 set_target_properties(ch04_08 PROPERTIES LINKER_LANGUAGE CXX)
+
+# chapter 5
+# ----------
+add_executable(ch05_01
+        modern-x86-assembly/ch_05/Ch05_01.cpp
+        modern-x86-assembly/ch_05/Ch05_01.asm
+)
+set_target_properties(ch05_01 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_02
+        modern-x86-assembly/ch_05/Ch05_02.cpp
+        modern-x86-assembly/ch_05/Ch05_02.asm
+)
+set_target_properties(ch05_02 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_03
+        modern-x86-assembly/ch_05/Ch05_03.cpp
+        modern-x86-assembly/ch_05/Ch05_03.asm
+)
+set_target_properties(ch05_03 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_04
+        modern-x86-assembly/ch_05/Ch05_04.cpp
+        modern-x86-assembly/ch_05/Ch05_04.asm
+)
+set_target_properties(ch05_04 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_05
+        modern-x86-assembly/ch_05/Ch05_05.cpp
+        modern-x86-assembly/ch_05/Ch05_05.nasm
+        modern-x86-assembly/ch_05/cmpequ_fp.nasmh
+)
+target_include_directories(ch05_05 PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_05"
+)
+set_target_properties(ch05_05 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_06
+        modern-x86-assembly/ch_05/Ch05_06.cpp
+        modern-x86-assembly/ch_05/Ch05_06.asm
+)
+set_target_properties(ch05_06 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch05_07
+        modern-x86-assembly/ch_05/Ch05_07.cpp
+        modern-x86-assembly/ch_05/Ch05_07.asm
+)
+target_include_directories(ch05_07 PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_05"
+)
+set_target_properties(ch05_07 PROPERTIES LINKER_LANGUAGE CXX)

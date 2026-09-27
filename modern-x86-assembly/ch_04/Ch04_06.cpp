@@ -34,7 +34,7 @@ static void CopyArray()
     }
 }
 
-static void FillArray(void)
+static void FillArray( )
 {
     constexpr int64_t fill_val = -7;
     constexpr size_t n = 10;

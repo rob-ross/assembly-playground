@@ -40,8 +40,9 @@ void DisplayResults(char sea_char, size_t n1, size_t n2)
     std::cout << "Search char: " << sea_char << " | ";
     std::cout << "Character counts: n1 = " << n1 << ", n2 = " << n2 << nl;
 
-    if (n1 != n2)
+    if (n1 != n2) {
         std::cout << "compare check failed!\n";
+    }
 }
 
 

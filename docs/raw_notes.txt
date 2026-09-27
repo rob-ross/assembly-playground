@@ -58,6 +58,10 @@ used for string or data copying instructions for output
 RSI (8 bytes), ESI (4 bytes), SI (2 bytes)
 used for string or data copying instructions for input
 
+MXCSR Register: control flags for floating point operations, like rounding
+
+MXCSR.IM : if 0, floating-point invalid operation exceptions are unmasked
+
 
 size modifiers:
 qword   : quad word, 8 bytes (64 bits)
@@ -70,8 +74,9 @@ Brackets [] indicate a dereference operation
 $ means "current address"
 
 Operations:
-
+********************************
 add : adds the operands and places the result in the first register
+    When adding two registers, they must be the same width
     add rdi, rsi   ; add the values in rdi and rsi together and place result in rdi
     add rdi, qword ptr [rsp - 8]  ; add rdi to the value at the computed address, store result in rdi
 
@@ -82,8 +87,24 @@ cmp : compare two values by subtracting the second op from the first. The result
                     ;
     cmp rdi, rsi    ;
 
+cmps: compare string operands:
+        compare two string values at locations in rdi and rsi. Advance each after the compare by the data size
+        cmpsb, cmpsw, cmpsd, cmpsq
+
+CWD/CDQ/CQO : convert word to double word, convert double word to quad word, convert quad word to octo word
+    Doubles the size of the operand in register AX, EAX, or RAX and
+    stores the result in registers DX:AX, EDX:EAX, or RDX:RAX, respectively
+
+
+dup:    MASM directive, "duplicate"
+    e.g.
+        Val8 db ?         ; Val8 is a single uninitialized data byte
+        PadA db 7 dup (?) ; PadA is a data byte, duplicated 7 times. `?` means it has no initial value
+
 inc : increment register
     inc rsi ; adds 1 to the value in rsi and stores in rsi
+
+jcc: jump on condition code
 
 jg  : jump if greater. evaluates result of last cmp, if first operand was > second operand, makes the jump
     jg .greater ; jump to label .greater
@@ -97,6 +118,13 @@ lea : load effective address
 
 leave :  restores rsp and rbp. copies rbp into rsp, pop rbp.
 
+lods:   load string data
+lodsb, lodsw,lodsd, lodsq
+
+    ; lodsb: load byte at address (R)SI into AL (loads [rsi] into rax)
+    ; after the load, increments/decrements the value in rsi by the size of the operand,
+    ; uses EFLAGS.DF 0 == increment, 1 == decrement. Default on mac/System V is 0
+
 
 mov : copies data. only 1 operand can be memory.
     ;  mov instruction is the only instruction that supports 64-bit immediate operands.
@@ -105,7 +133,10 @@ mov : copies data. only 1 operand can be memory.
     mov qword ptr [rsp - 8], rsi  ; [rsp - 8] is a computed expression
                                   ; `qword ptr` dereferences the int expression value to obtain an address
                                   ; copy value from rsi to the evaluated memory address
-
+movs: movsb, movsw, movsd, movsq
+    move string operands specified with the second operand (mem source operand in [rsi])
+    to the location specified with the first operand (mem destination operand in [rdi]).
+    after the move, both registers are incremented by data size
 
 mul : unsigned int multiply.
     ; multiplies rax and the given operand, stores in rdx:rax.
@@ -113,19 +144,57 @@ mul : unsigned int multiply.
     ; multiplying two n-bit numbers results in a max product size of 2n
     mul rbx ; equivalent in C to rdx:rax = rax * rbx. Result stored in rax, overflow in rdx
 
+
+pop : pop value at top of stack into the given register
+    pop rsi     ;  copies 8 bytes from top of stack into rsi (low address to high address)
+                ;  stack pointer rsp is incremented by 8 bytes
+
+popfq: pop EFLAGS from stack into RFLAGS
+
+
+push: PUSHF/PUSHFD/PUSHFQ — Push EFLAGS Register Onto the Stack
+
 push : push register value onto stack
     push rdi  ; push value of rdi register to top of stack, given by rsp stack pointer
               ; rdi is 8 byte register, so 8 bytes are written to stack.
               ; LE means lsb of register value is written first.
               ; rsp stack pointer is also decremented by 8 bytes
 
-pop : pop value at top of stack into the given register
-    pop rsi     ;  copies 8 bytes from top of stack into rsi (low address to high address)
-                ;  stack pointer rsp is incremented by 8 bytes
+rep:
+    REP/REPE/REPZ/REPNE/REPNZ — Repeat String Operation Prefix
+    works with rcx to count down/up according to EFLAGS.DF
 
 
 ret : return from subroutine. Current subroutine must have been invoked with a call instruction
     ret
+
+setcc : set byte on condition code. set the destination byte to 1 if condition is met, 0 otherwise
+sete  : set byte if equal.
+setp  : set byte if parity bit is set
+
+std:    set direction flag, RFLAGS.DF to 1
+
+stos:
+    STOS/STOSB/STOSW/STOSD/STOSQ — Store String
+    Store RAX at address in RDI
+
+vcmpss, vcmpsd : compare two scalar floats
+    Doesn't set any bits in RFLAGS. Instead, sets the destination to all 0s or 1s according to predicate evaluation
+
+vcomiss, vcomisd : compare two scalar floats.
+    Similar to vucomi[s|d], except throws exception (if enabled) if an operand is SNaNs or QNaNs
+
+vucomiss, vucomisd : unordered compare of scalar floats
+    Sets RFLAGS.ZF, PF, CF
+    unordered if all set, > if all unset, < if CF set, equal if ZF set
+    check PF for unordered result
+    throws exception (if enabled) for SNaNs but not QNaNs
+
+xor : logical exclusive or
+    Store the result of two registers or memory locations in the destination
+    fastest way to clear a register is to xor it with itself.
+    e.g.: xor rax, rax  ; rax := 0
+
 
 
 Jumping : jcc = jump on condition code
@@ -156,6 +225,10 @@ Looping:
     inc rcx
     jmp .for
  .endfor
+
+
+
+
 
 CPU FEATURES
 
@@ -196,3 +269,20 @@ Effective Address = BaseReg + IndexReg * ScaleFactor + Disp
     Disp        = 8-, 16-, or 32-bit signed offset
 
 see table 1.6 in "X86-64 Core architecture"
+
+DWARF debug info:
+------------------
+View the DWARF Line Table:
+dwarfdump --debug-line cmake-build-debug/CMakeFiles/ch05_04.dir/modern-x86-assembly/ch_05/Ch05_04.asm.o
+
+View the DWARF Function and Symbol Descriptors: (Type, Subprogram, and Scope Descriptors)
+dwarfdump --debug-info cmake-build-debug/CMakeFiles/ch05_04.dir/modern-x86-assembly/ch_05/Ch05_04.asm.o
+
+View the __DWARF Segments in the Mach-O Object File:
+otool -l cmake-build-debug/CMakeFiles/ch05_04.dir/modern-x86-assembly/ch_05/Ch05_04.asm.o | grep -A 5 __DWARF
+
+View the Executable's Debug Map Linking to .o Files:
+dsymutil -s cmake-build-debug/ch05_04
+
+You can view the actual symbol descriptors using nm or otool:
+nm cmake-build-debug/CMakeFiles/ch05_04.dir/modern-x86-assembly/ch_05/Ch05_04.asm.o
