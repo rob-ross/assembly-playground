@@ -25,3 +25,23 @@ print xmm register:
 
 
 
+session settings:
+
+    settings set target.expr-prefix "p/f"       // default to float formatting
+
+command aliases (like macros):
+
+    command alias pd register read -f double[]  // type "pd xmm0" as a shortcut
+
+
+permanent settings:
+
+    use .lldbinit file
+    Open (or create) the file ~/.lldbinit in your user directory.
+    Add your favorite shortcuts to the file, one per line:
+    e.g.:
+        # Custom register viewing shortcuts
+        command alias pxd register read -f double[]
+        command alias pxf register read -f float[]
+        command alias pxb register read -f bin
+        command alias ld p *(double*)&

@@ -1,49 +1,44 @@
 ;------------------------------------------------------------------------------
-; Ch05_07.asm
-; Created by Rob Ross on 9/27/26.
-;
+; Ch05_07_fasm.s
 ;------------------------------------------------------------------------------
 
 default rel
 
-
-section .text
-
 ;------------------------------------------------------------------------------
-; rax                          rdi              rsi       rdx
 ; bool CalcMeanF64_avx(double* mean, const double* x, size_t n);
 ;------------------------------------------------------------------------------
+
+        section .text
 
 global _CalcMeanF64_avx
 _CalcMeanF64_avx:
 
-; Make sure n is valid, must be > 1
-    cmp     rdx, 1      ; is rdx > 1?
-    jbe    .BadN        ; return error
+; Make sure n is valid
+        cmp rdx,1                           ;is n <= 1?
+        jbe BadAr1                          ;jump if yes
 
 ; Initialize
-    vxorpd  xmm0, xmm0, xmm0    ; sum := 0, clear xmm0
-    mov     rcx, -1     ; i := -1, initialize loop variable
+        sub rsi,8                           ;rsi = &x[-1]
+        vxorpd xmm0,xmm0,xmm0               ;sum = 0.0
+        vcvtsi2sd xmm1,xmm1,rdx             ;convert n to DPFP
 
-.Loop:
-    add     rcx, 1      ; i += 1
-    vaddsd  xmm0, xmm0, [rsi+rcx*8]   ; sum += x[i]
-    cmp     rcx, rdx    ; is i < n?, is rcx < rdx?
-    jb     .Loop        ; if true continue loop
+; Sum the elements of x
+Loop1:  add rsi,8                           ;rsi = &x[i]
+        vaddsd xmm0,xmm0,[rsi]              ;sum += x[i]
+        sub rdx,1                           ;n -= 1
+        jnz Loop1                           ;repeat until n == 0
 
 ; Calculate and save the mean
-    vcvtsi2sd   xmm1, xmm1, rdx     ; xmm1 := n
-    vdivsd      xmm1, xmm0, xmm1    ; mean := sum / n
-    vmovsd      [rdi], xmm1         ; save result
-    mov         eax, 1              ; set return value "true"
-    ret
+        vdivsd xmm1,xmm0,xmm1               ;xmm2 = mean = sum / n
+        vmovsd [rdi],xmm1                   ;save mean
 
-.BadN:
-    xor     eax, eax    ; set error return to 0, "false"
-    ret
+        mov eax,1                           ;set success return code
+        ret
+
+BadAr1: xor eax,eax                         ;set error return code
+        ret
 
 ;------------------------------------------------------------------------------
-;  rax                             rdi             rsi        rdx         xmm0
 ; bool CalcStDevF64_avx(double* st_dev, const double* x, size_t n, double mean);
 ;------------------------------------------------------------------------------
 
@@ -51,33 +46,34 @@ global _CalcStDevF64_avx
 _CalcStDevF64_avx:
 
 ; Make sure n is valid
-    cmp     rdx, 1      ; is n <= 1?
-    jbe     .BadN       ; jmp to .BadN if <= 1
+        cmp rdx,1                           ;is n <= 1?
+        jbe BadAr2                          ;jump if yes
 
 ; Initialize
-    ; xmm0 containst the mean
-    vxorpd  xmm1, xmm1, xmm1    ; double sum_squares = 0.0;
-    mov    rcx, -1              ; i := -1
+        sub rsi,8                           ;rsi = &x[-1]
+        mov r9,rdx                          ;r9 = n
+        sub r9,1                            ;r9 = n - 1 (for SD calculation)
+        vcvtsi2sd xmm4,xmm4,r9              ;convert n - 1 to DPFP
+        vmovsd xmm3,xmm0,xmm0               ;xmm3 = mean
+        vxorpd xmm0,xmm0,xmm0               ;sum_squares = 0.0
 
-.Loop:
-    add     rcx, 1                      ; i += 1
-    vsubsd  xmm2, xmm0, [rsi+rcx*8 ]    ; temp := x[i] - mean
-    vmulsd  xmm2, xmm2, xmm2            ; temp *= temp
-    vaddsd  xmm1, xmm1, xmm2            ; sum += temp
-    cmp     rcx, rdx                    ; is i < n?
-    jb      .Loop                       ; if so, continue loop
+; Sum the elements of x
+Loop2:  add rsi,8                           ;rsi = &x[i]
+        vmovsd xmm1,[rsi]                   ;xmm1 = x[i]
+        vsubsd xmm2,xmm1,xmm3               ;xmm2 = x[i] - mean
+        vmulsd xmm2,xmm2,xmm2               ;xmm2 = (x[i] - mean) ** 2
+        vaddsd xmm0,xmm0,xmm2               ;sum_squares += (x[i] - mean) ** 2
 
-; Calculate and save the standard deviation
-    ; here rcx == n,
-    sub     rcx, 1      ; rcx := n - 1
-    vcvtsi2sd   xmm2, xmm2, rcx     ; convert (n-1) to double
-    vdivsd      xmm2, xmm1, xmm2    ; temp :=  sum_squares / (n-1)
-    vsqrtsd     xmm1, xmm1, xmm2    ; xmm1 := sqrt(temp)
-    vmovsd      [rdi], xmm1         ; save result
+        sub rdx,1                           ;n -= 1
+        jnz Loop2                           ;repeat until done
 
-    mov         eax, 1              ; return success "true"
-    ret
+; Calculate and save standard deviation
+        vdivsd xmm0,xmm0,xmm4               ;xmm0 = sum_squares / (n - 1)
+        vsqrtsd xmm0,xmm0,xmm0              ;xmm0 = st_dev
+        vmovsd [rdi],xmm0                   ;save st_dev
 
-.BadN:
-    xor     eax, eax    ; set error return to 0, "false"
-    ret
+        mov eax,1                           ;set success return code
+        ret
+
+BadAr2: xor eax,eax                         ;set error return code
+        ret

@@ -61,8 +61,11 @@ bool CalcStDevF64_cpp(double* st_dev, const double* x, size_t n, double mean)
     for (size_t i = 0; i < n; i++)
     {
         double temp = x[i] - mean;
+        std::cout << "temp = " << temp << std::endl;
+
         sum_squares += temp * temp;
     }
+    std::cout << "sum_squares = " << sum_squares << std::endl;
 
     *st_dev = sqrt(sum_squares / ( static_cast<double>(n) - 1.0));
     return true;
