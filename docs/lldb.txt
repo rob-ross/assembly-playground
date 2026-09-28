@@ -1,0 +1,27 @@
+Notes on using LLDB to debug assembly
+
+print a register:
+    p $rax
+
+    To format the value, use a format name ( >"help format")
+    e.g.:
+    p/f $rax    // will print contents of $rax formatted as a float
+    p/d $rax    // formatted as decimal
+    p/u $rax    // unsigned decimal
+    p/x $rax    // formatted as hex
+
+print xmm register:
+    p $xmm0             // treats register as a vector of 16 bytes.
+    register read xmm0  // treats as vector of 16 bytes
+    register read -f f xmm0     // force to float format. The -f f treats the register as 4 floats
+    register read -f F xmm0     // force to complex float format.
+    register read -f float64[] xmm0
+
+
+    p (double __attribute__((ext_vector_type(2))))$xmm0     // treats as vector of 2 doubles
+    p (float __attribute__((ext_vector_type(4))))$xmm0      // treats as vector of 4 floats
+    p *(double*)&$xmm0      // treats low 8 bytes as double
+    p *(float*)&$xmm0       // treats low 4 bytes as float
+
+
+

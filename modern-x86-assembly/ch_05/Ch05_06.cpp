@@ -50,7 +50,7 @@ const std::string c_RcStrings[] = { "Nearest", "Down", "Up", "Zero" };
 constexpr RC c_RcVals[] = { RC::Nearest, RC::Down, RC::Up, RC::Zero };
 constexpr size_t c_NumRC = sizeof(c_RcVals) / sizeof(RC);
 
-int main(void)
+int main()
 {
     constexpr char nl = '\n';
     Uval src1, src2, src3, src4, src5, src6, src7;

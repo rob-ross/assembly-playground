@@ -58,10 +58,13 @@ used for string or data copying instructions for output
 RSI (8 bytes), ESI (4 bytes), SI (2 bytes)
 used for string or data copying instructions for input
 
-MXCSR Register: control flags for floating point operations, like rounding
+MXCSR Register: Control and Status register
+    a 32-bit control and status register used for Streaming SIMD Extensions (SSE)
+    and AVX floating-point operations in x86/x64
+    control flags for floating point operations, like rounding
 
 MXCSR.IM : if 0, floating-point invalid operation exceptions are unmasked
-
+MXCSR.RC : Controls rounding modes (0 = nearest, 1 = down, 2 = up, 3 = truncate).
 
 size modifiers:
 qword   : quad word, 8 bytes (64 bits)

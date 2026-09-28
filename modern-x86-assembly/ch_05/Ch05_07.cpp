@@ -47,7 +47,7 @@ bool CalcMeanF64_cpp(double* mean, const double* x, size_t n)
     for (size_t i = 0; i < n; i++)
         sum += x[i];
 
-    *mean = sum / n;
+    *mean = sum / static_cast<double>(n);
     return true;
 }
 
@@ -64,7 +64,7 @@ bool CalcStDevF64_cpp(double* st_dev, const double* x, size_t n, double mean)
         sum_squares += temp * temp;
     }
 
-    *st_dev = sqrt(sum_squares / (n - 1));
+    *st_dev = sqrt(sum_squares / ( static_cast<double>(n) - 1.0));
     return true;
 }
 
@@ -102,7 +102,7 @@ static void CalcMeanStDevF64()
         std::cout << "Invalid return code\n";
 }
 
-int main(void)
+int main()
 {
     CalcMeanStDevF64();
     return 0;
