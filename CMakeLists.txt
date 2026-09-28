@@ -202,3 +202,12 @@ target_include_directories(ch05_07 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_05"
 )
 set_target_properties(ch05_07 PROPERTIES LINKER_LANGUAGE CXX)
+
+
+# chapter 6
+
+add_executable(ch06_05
+        modern-x86-assembly/ch_06/Ch06_05.cpp
+        modern-x86-assembly/ch_06/Ch06_05.asm
+)
+set_target_properties(ch06_05 PROPERTIES LINKER_LANGUAGE CXX)
