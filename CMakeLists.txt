@@ -205,9 +205,21 @@ set_target_properties(ch05_07 PROPERTIES LINKER_LANGUAGE CXX)
 
 
 # chapter 6
-
+# ----------
 add_executable(ch06_05
         modern-x86-assembly/ch_06/Ch06_05.cpp
         modern-x86-assembly/ch_06/Ch06_05.asm
 )
 set_target_properties(ch06_05 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch06_06
+        modern-x86-assembly/ch_06/Ch06_06.cpp
+        modern-x86-assembly/ch_06/Ch06_06.asm
+)
+set_target_properties(ch06_06 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch06_07
+        modern-x86-assembly/ch_06/Ch06_07.cpp
+        modern-x86-assembly/ch_06/Ch06_07.asm
+)
+set_target_properties(ch06_07 PROPERTIES LINKER_LANGUAGE CXX)
