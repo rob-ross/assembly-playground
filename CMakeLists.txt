@@ -14,7 +14,8 @@ set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -g -F dwarf")
 
 # Add your assembly source file(s)
 add_executable(assembly_playground
-        src/hello.asm
+        src/unaligned_call_test.asm
+#        src/hello.asm
         #src/chapter_03/memory.asm
         #src/hello3.asm
 #        src/nibblebits/test_print.asm
@@ -231,3 +232,12 @@ add_executable(ch07_01
         modern-x86-assembly/ch_07/Ch07_01.asm
 )
 set_target_properties(ch07_01 PROPERTIES LINKER_LANGUAGE CXX)
+
+# chapter 8
+# ----------
+add_executable(ch08_01
+        modern-x86-assembly/ch_08/Ch08_01.cpp
+        modern-x86-assembly/ch_08/Ch08_01.asm
+        modern-x86-assembly/ch_08/XmmVal.h
+)
+set_target_properties(ch08_01 PROPERTIES LINKER_LANGUAGE CXX)

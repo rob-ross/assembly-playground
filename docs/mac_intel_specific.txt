@@ -1,0 +1,43 @@
+
+
+Global Symbols
+---------------
+In macho64 files, all exported/imported symbols must start with an underscore.
+If an asm function is meant to be called from C, the function label must start with an underscore
+in the asm file (the extern decl in the C file is normal, witout the leading underscore.)
+Global variable names must also begin with an underscore.
+External names must be prefixed with underscore.
+
+Stack Alignment
+----------------
+rsp must be 16-byte aligned for all function calls or segv.
+On Mac, at the start of a function the caller will have pushed the 8-byte return address, so the stack is
+always miss-aligned. If you use a stack frame, calling `push rpb` pushes 8 bytes to the stack, which aligns it to 16.
+
+    Simple trick if you don't want to keep track of alignment of local variables:
+    `and rsp, -16`
+    this will clear the low 4 bits, effectively subtracting 0 or 8 from the rsp, and
+    aligning to 16 bytes. WARNING: local variables that use rsp-relative offsets will be affected!!!!
+
+    Always using a stack frame allows all local variable references to be
+    relative to rbp.
+
+    Or you can `push rsp` first, modify rsp, call the function, then `pop rsp`
+
+    This is only required when calling  function. Leaf functions don't need to align the stack.
+    Or you can manually ensure that the stack space you reserve is 16-byte aligned.
+
+
+System Calls
+-------------
+MachO uses a class offset for system function ids. You must add 0x2000000 to the call number.
+
+
+Variadic parameters
+--------------------
+Integers:
+integers less than 4 bytes (i.e., char, short) must be promoted to 4 bytes.
+
+Floats:
+C functions expect any variadic float arguments to be converted to double precision, using double precision commands.
+rax must be set to the number of float arguments.
