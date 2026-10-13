@@ -241,3 +241,9 @@ add_executable(ch08_01
         modern-x86-assembly/ch_08/XmmVal.h
 )
 set_target_properties(ch08_01 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch08_02
+        modern-x86-assembly/ch_08/Ch08_02.cpp
+        modern-x86-assembly/ch_08/Ch08_02.asm
+)
+set_target_properties(ch08_02 PROPERTIES LINKER_LANGUAGE CXX)
