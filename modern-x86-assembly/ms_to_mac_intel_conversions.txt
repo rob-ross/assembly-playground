@@ -26,7 +26,7 @@ IntegerLogical_ proc -> global _IntegerLogical_
 7. in extern declarations for variables, the type is not specified.
 extern g_Val1:dword -> extern _g_Val1
 
-8. When declaring variable names, they are labels and must end with a colon:
+8. When declaring variable names, they are labels and should end with a colon:
 g_NumPrimes_a ... -> g_NumPrimes_a: ...
 
 9. Section .constant/.rdata is .rodata in mach64

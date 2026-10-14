@@ -2,6 +2,8 @@
 ; man_asm_link.asm
 ; Created by Rob Ross on 9/29/26.
 ;
+; How-to Manually assembly and link a nasm assembly language file
+;
 ; Assemble:
 ;   nasm -f macho64 man_asm_link.asm -o test1.o
 ;

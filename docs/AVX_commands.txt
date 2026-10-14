@@ -1,0 +1,238 @@
+###VM
+
+VMOVDQA: Move Aligned Double Quadword
+
+Moves aligned packed integer values. Values can be moved from a register or a memory location to a register,
+or from a register to a register or a memory location.
+A memory operand that is not aligned causes a general-protection exception.
+
+XMM Encoding
+Moves two aligned quadwords (128-bit move). There are two encodings.
+• The source operand is an XMM register. The destination is an XMM register or a 128-bit memory
+location.
+• The source operand is an XMM register or a 128-bit memory location. The destination is an XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+        vmovdqa     xmm0, [rsi]     ; copy 16 aligned bytes from memory into xmm0
+
+###VP
+
+VPCMPEQB: Packed Compare Equal Bytes
+VPCMPEQW: Packed Compare Equal Words
+VPCMPEQD: Packed Compare Equal Doublewords
+VPCMPEQQ: Packed Compare Equal Quadwords
+
+Compares 16, 32 or 64 packed byte/word/double word/quad word values in the first source operand to corresponding values
+in the second source operand and writes the result of each comparison to the corresponding elements in the destination.
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register or a 128-bit memory location.
+The destination is a third XMM register.
+
+Example:
+    vpcmpeqb    xmm4, xmm4, xmm4    ; sets xmm4 to all 1s. All bits set.
+
+VPEXTRQ: Extract Packed Quadword
+
+Extracts a quadword from a source register and writes it to an 64-bit memory location
+or to a 64-bit general-purpose register.
+Bit [0] of an immediate byte operand selects the quadword to be extracted:
+0: src[63:0]
+1: src[127:64]
+
+Example:
+        vpextrq      [rdi], xmm2, 0     ; save low quadword in xmm2 to quadword at pointer
+
+
+VPMINUB: Packed Minimum Unsigned Bytes
+
+Compares each packed 8-bit unsigned integer value of the first source operand to the corresponding value
+of the second source operand and writes the numerically lesser value into the corresponding byte of the destination.
+The 128-bit form of the instruction compares 16 pairs of 8-bit unsigned integer values;
+the 256-bit form compares 32 pairs, and the 512-bit form compares 64 pairs.
+
+XMM
+The first source operand is an XMM register.
+The second source operand is an XMM register or a 128-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the YMM/ZMM register that corresponds to the destination are cleared.
+
+Example:
+    vpminub     xmm0, xmm0, xmm4    ; xmm0[63:0] = final 8 min vals
+
+
+VPMULDQ: Packed Multiply Signed Doubleword to Quadword
+
+Multiplies two or four pairs of 32-bit signed integers in the first and second source operands and writes
+two or four packed quadword signed integer products to the destination.
+For the 128-bit form of the instruction, the following operations are performed:
+    dest is the destination register – either an XMM register or the corresponding YMM register.
+    src1 is the first source operand.
+    src2 is the second source operand.
+
+    dest[63:0] = (src1[31:0] * src2[31:0])
+    dest[127:64] = (src1[95:64] * src2[95:64])
+
+Additionally, for the 256-bit form of the instruction, the following operations are performed:
+    dest[191:128] = (src1[159:128] * src2[159:128])
+    dest[255:192] = (src1[223:192] * src2[223:192])
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register, a 128-bit memory location, or (for EVEX encodings)
+a broadcast 64-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+    ; this multiplies the low order double words (ints) of each quadword
+    ; in xmm0 and xmm1 and stores them in xmm2.
+    ; xmm2[0] is a quad word, 8 bytes, the product of double word  (ints) xmm0[0] * xmm1[0]
+    ; xmm2[1] is a quad word, 8 bytes, the produce of the low order double words (ints) in xmm0[2] * xmm1[2]
+    ; note that each quad word product is the complete result of the multiplication of 2 double words
+    vpmuldq      xmm2, xmm0, xmm1    ; packed mul - a*b even dwords
+
+
+VPMULLD: Packed Multiply and Store Low Signed Doubleword
+
+Multiplies four, eight, or sixteen packed 32-bit signed integers in the first source operand
+by the corresponding values in the second source operand and writes bits [31:0] of each 64-bit product
+to the corresponding 32-bit element of the destination.
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register, a 128- bit memory location or
+(for EVEX encodings) a broadcast 32-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+        ; multiply the 4 double words in xmm0 by the 4 dw in xmm1 and store the low order 4 bytes of each 4 products
+        ; in xmm2
+        vpmulld     xmm2, xmm0, xmm1    ; xmm2 = a * b, packed mul - low result
+
+
+VPMULLW: Packed Multiply Low Signed Word
+
+Multiplies 8, 16 or 32 packed 16-bit signed integers in the first source operand by the corresponding values
+in the second source operand and writes bits [15:0] of each 32-bit product to
+the corresponding 16-bit element of the destination.
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register or a 128-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+        ; for each dword product from word operands in xmm0 * xmm1, store the low order product bytes in xmm2
+        vpmullw     xmm2, xmm0, xmm1
+        vpmulhw     xmm3, xmm0, xmm1 ; packed mul high signed word
+
+
+VPSLLW: Packed Shift Left Logical Words
+
+Left-shifts each packed 16-bit value in the source operand as specified by a shift-count operand and
+writes the shifted values to the destination.
+The shift-count operand can be an immediate byte, a second register, or a memory location.
+The shift count is treated as an unsigned integer. When the shift count is provided by a register or memory location,
+only bits [63:0] of the value are considered. Low-order bits emptied by shifting are cleared.
+When the shift count is greater than 15, the destination is cleared.
+
+XMM Encoding
+There are two 128-bit encodings. These differ based on the type of count operand.
+The first source operand is an XMM register.
+The shift count is specified by either a second XMM register or a 128-bit memory location,
+or by an immediate 8-bit operand.
+The destination is an XMM register. For the immediate operand encoding, the destination is specified by VEX.vvvv.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+
+
+
+VPSRLDQ: Packed Shift Right Logical Double Quadword
+
+Right-shifts (logical) one or each of two double quadword values in the source operand the number of bytes
+specified by an immediate byte operand and writes the shifted values to the destination.
+The immediate byte operand supplies an unsigned shift count. High-order bytes emptied by shifting are cleared.
+When the shift value is greater than 15, the destination is cleared.
+For the 256-bit form of the instruction, the shift count is applied to both the upper and the lower double quadword.
+Bytes shifted out of the upper 128 bits are not shifted into the lower.
+
+XMM Encoding
+The source operand is an XMM register.
+The destination is an XMM register specified by VEX.vvvv.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+    vpsrldq      xmm3, xmm0, 4       ; shift xmm0 right 4 bytes and store result in xmm3
+
+
+VPXOR:  Packed Exclusive OR
+VPXORD: Packed XOR Doublewords
+VPXORQ: Packed XOR Quadwords
+
+Performs a bitwise XOR of the first and second source operands and writes the result to the destination. (VPXOR)
+Performs a bitwise XOR of four, eight, or sixteen packed doubleword integers in the first and second source operands
+and writes the result to the destination.(VPXORD)
+Performs a bitwise XOR of 2, 4 or 8 packed quadword integers in the first and second source operands and
+writes the result to the destination.(VPXORQ)
+
+When either of a pair of corresponding bits in the first and second operands are set, the corresponding bit
+of the destination is set; when both source bits are set or when both source bits are not set,
+the destination bit is cleared.
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register or a 128-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+VPUNPCKLWD: Unpack and Interleave Low Words
+
+Unpacks the four low-order words of each octword of the first and second source operands and
+interleaves the words as they are copied to the destination.
+The high-order words of each octword of the source operands are ignored.
+Words are interleaved in ascending order from the least-significant word of the source operands with words
+from the first source operand occupying the lower word of each pair copied to the destination.
+
+For the 128-bit form of the instruction, the following operations are performed:
+dest[15:0]    = src1[15:0]
+dest[31:16]   = src2[15:0]
+dest[47:32]   = src1[31:16]
+dest[63:48]   = src2[31:16]
+dest[79:64]   = src1[47:32]
+dest[95:80]   = src2[47:32]
+dest[111:96]  = src1[63:48]
+dest[127:112] = src2[63:48]
+
+Additionally, for the 256-bit form of the instruction, the following operations are performed:
+dest[143:128] = src1[143:128]
+dest[159:144] = src2[143:128]
+dest[175:160] = src1[159:144]
+dest[191:176] = src2[159:144]
+dest[207:192] = src1[175:160]
+dest[223:208] = src2[175:160]
+dest[239:224] = src1[191:176]
+dest[255:240] = src2[191:176]
+
+When the second source operand is all 0s, the destination effectively receives the 4 low-order words
+from the first source operand or the 4 low-order words of each octword of
+the first source operand zero-extended to 32 bits.
+This operation is useful for expanding unsigned 16-bit values to unsigned 32-bit operands for subsequent
+processing that requires higher precision.
+
+XMM Encoding
+The first source operand is an XMM register.
+The second source operand is an XMM register or a 128-bit memory location.
+The destination is a third XMM register.
+Bits above bit 127 of the ZMM/YMM register that corresponds to the destination are cleared.
+
+Example:
+        ; Unpack and Interleave Low Words
+        vpunpcklwd  xmm4, xmm2, xmm3    ; packed low-order dwords
+        ; Unpack and Interleave High Words
+        vpunpckhwd  xmm5, xmm2, xmm3    ; packed high-order dwords

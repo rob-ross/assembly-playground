@@ -45,3 +45,10 @@ permanent settings:
         command alias pxf register read -f float[]
         command alias pxb register read -f bin
         command alias ld p *(double*)&
+
+
+CLion integrated LLDB debugger:
+
+To view a AVX register as packed, use e.g.,:
+*(short(*)[8])&$xmm0 // casts xmm0 to an array of 8 shorts
+*(int(*)[4])&$xmm0   // casts xmm1 to an array of 4 ints

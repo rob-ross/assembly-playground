@@ -48,7 +48,7 @@ _MulI32a_avx:
     vmovdqa     xmm1, [rdx]     ; xmm1 = b
 
     ; Packed Multiply and Store Low Signed Doubleword
-    vpmulld     xmm2, xmm0, xmm1    ; xmm2 = a * p, packed mul - low result
+    vpmulld     xmm2, xmm0, xmm1    ; xmm2 = a * b, packed mul - low result
 
     vmovdqa     [rdi], xmm2         ; save c
 
@@ -66,6 +66,10 @@ _MulI32b_avx:
     vmovdqa     xmm1, [rdx]     ; xmm1 = b
 
     ; Packed Multiply Signed Doubleword to Quadword
+    ; this multiplies the low order double words (ints) of each quadword
+    ; in xmm0 and xmm1 and stores them in xmm2.
+    ; xmm2[0] is a quad word, 8 bytes, the product of double word  (ints) xmm0[0] * xmm1[0]
+    ; xmm2[1] is a quad word, 8 bytes, the produce of the low order double words (ints) in xmm0[2] * xmm1[2]
     vpmuldq      xmm2, xmm0, xmm1    ; packed mul - a*b even dwords
     ; Packed Shift Right Logical Double Quadword
     vpsrldq      xmm3, xmm0, 4       ; shift a_vals right 4 bytes

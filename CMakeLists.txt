@@ -247,3 +247,28 @@ add_executable(ch08_02
         modern-x86-assembly/ch_08/Ch08_02.asm
 )
 set_target_properties(ch08_02 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch08_03
+        modern-x86-assembly/ch_08/Ch08_03.cpp
+        modern-x86-assembly/ch_08/Ch08_03.asm
+)
+set_target_properties(ch08_03 PROPERTIES LINKER_LANGUAGE CXX)
+
+
+add_executable(ch08_04
+        modern-x86-assembly/ch_08/Ch08_04.cpp
+        modern-x86-assembly/ch_08/Ch08_04.asm
+)
+set_target_properties(ch08_04 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch08_05
+        modern-x86-assembly/ch_08/Ch08_05.cpp
+        modern-x86-assembly/ch_08/Ch08_05.asm
+)
+set_target_properties(ch08_05 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(ch08_06
+        modern-x86-assembly/ch_08/Ch08_06.cpp
+        modern-x86-assembly/ch_08/Ch08_06.asm
+)
+set_target_properties(ch08_06 PROPERTIES LINKER_LANGUAGE CXX)

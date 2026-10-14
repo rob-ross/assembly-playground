@@ -1,0 +1,20 @@
+
+
+
+byte:   standard 8 bits
+
+d word: double word
+
+dq: double quadword
+
+double word: two words, 4 bytes, 32 bits
+
+double quadword:    2 quad words, 8 words, 16 bytes, 128 bits
+
+octo word: double quadword,  8 words, 16 bytes, 128 bits
+
+word:   two bytes, 16 bits
+
+q word: quad word
+quad word: four words, 8 bytes, 64 bits
+

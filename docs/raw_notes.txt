@@ -181,6 +181,16 @@ stos:
     STOS/STOSB/STOSW/STOSD/STOSQ — Store String
     Store RAX at address in RDI
 
+
+TEST: Test Bits
+
+Performs a bit-wise logical and on the value in a register or memory location (first operand)
+with an immediate value or the value in a register (second operand) and sets the flags in the rFLAGS register
+based on the result.
+This instruction has two operands:
+TEST dest, src
+While the AND instruction changes the contents of the destination and the flag bits, the TEST instruction changes only the flag bits.
+
 vcmpss, vcmpsd : compare two scalar floats
     Doesn't set any bits in RFLAGS. Instead, sets the destination to all 0s or 1s according to predicate evaluation
 
