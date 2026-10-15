@@ -12,6 +12,20 @@ set(CMAKE_ASM_NASM_OBJECT_FORMAT macho64)
 set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -g -F dwarf")
 
 
+# Define external roblib dependency
+add_library(roblib STATIC IMPORTED)
+# ${CMAKE_CURRENT_SOURCE_DIR} is the top-level project directory.
+set_target_properties(roblib PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/libc_roblib.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/include"
+        # Since libc_roblib.a was built with sanitizers, anyone linking against it
+        # MUST also use those sanitizer flags to pull in the required runtimes.
+        # Only pass sanitize flags to C and C++ compilers, not to NASM
+        INTERFACE_COMPILE_OPTIONS "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:C,CXX>>:-fsanitize=address;-fsanitize=leak>"
+        INTERFACE_LINK_OPTIONS "$<$<CONFIG:Debug>:-fsanitize=address;-fsanitize=leak>"
+)
+
+
 # Add your assembly source file(s)
 add_executable(assembly_playground
         src/unaligned_call_test.asm
@@ -37,238 +51,70 @@ set_target_properties(assembly_playground PROPERTIES LINKER_LANGUAGE C)
 #
 ######################################################
 
-add_executable(ch02_01
-        modern-x86-assembly/ch_02/ch_02_01/Ch02_01.cpp
-        modern-x86-assembly/ch_02/ch_02_01/Ch02_01_misc.cpp
-        modern-x86-assembly/ch_02/ch_02_01/Ch02_01_fasm.asm
-)
-set_target_properties(ch02_01 PROPERTIES LINKER_LANGUAGE CXX)
 
-# chapter 2
-# ----------
-add_executable(ch02_02
-        modern-x86-assembly/ch_02/Ch02_02.cpp
-        modern-x86-assembly/ch_02/Ch02_02.asm
-)
-set_target_properties(ch02_02 PROPERTIES LINKER_LANGUAGE CXX)
+function(add_asm_example target_name)
+    add_executable(${target_name} ${ARGN})
+    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
+    target_link_libraries(${target_name} PRIVATE roblib)
+endfunction()
 
-add_executable(ch02_03
-        modern-x86-assembly/ch_02/Ch02_03.cpp
-        modern-x86-assembly/ch_02/Ch02_03.asm
-)
-set_target_properties(ch02_03 PROPERTIES LINKER_LANGUAGE CXX)
+function(add_asm_chapter_range chapter_num start_idx end_idx)
+    # Ensure chapter has a 2-digit zero-padded string (e.g., 2 -> "02")
+    if(chapter_num LESS 10)
+        set(ch_pad "0${chapter_num}")
+    else()
+        set(ch_pad "${chapter_num}")
+    endif()
 
-add_executable(ch02_04
-        modern-x86-assembly/ch_02/Ch02_04.cpp
-        modern-x86-assembly/ch_02/Ch02_04.asm
-)
-set_target_properties(ch02_04 PROPERTIES LINKER_LANGUAGE CXX)
+    foreach(i RANGE ${start_idx} ${end_idx})
+        # Ensure example index has a 2-digit zero-padded string (e.g., 1 -> "01")
+        if(i LESS 10)
+            set(idx_pad "0${i}")
+        else()
+            set(idx_pad "${i}")
+        endif()
 
-add_executable(ch02_05
-        modern-x86-assembly/ch_02/Ch02_05.cpp
-        modern-x86-assembly/ch_02/Ch02_05.asm
-)
-set_target_properties(ch02_05 PROPERTIES LINKER_LANGUAGE CXX)
+        set(target_name "ch${ch_pad}_${idx_pad}")
+        set(base_path "modern-x86-assembly/ch_${ch_pad}/Ch${ch_pad}_${idx_pad}")
 
-# chapter 3
-# ----------
-add_executable(ch03_01
-        modern-x86-assembly/ch_03/Ch03_01.cpp
-        modern-x86-assembly/ch_03/Ch03_01.asm
-)
-set_target_properties(ch03_01 PROPERTIES LINKER_LANGUAGE CXX)
+        add_asm_example(${target_name}
+                "${base_path}.cpp"
+                "${base_path}.asm"
+        )
+    endforeach()
+endfunction()
 
-add_executable(ch03_02
-        modern-x86-assembly/ch_03/Ch03_02.cpp
-        modern-x86-assembly/ch_03/Ch03_02.asm
-)
-set_target_properties(ch03_02 PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(ch03_03
-        modern-x86-assembly/ch_03/Ch03_03.cpp
-        modern-x86-assembly/ch_03/Ch03_03.asm
-)
-set_target_properties(ch03_03 PROPERTIES LINKER_LANGUAGE CXX)
+# example of custom call to add_asm_example
+#add_asm_example(ch02_01
+#        modern-x86-assembly/ch_02/Ch02_01.cpp
+#        modern-x86-assembly/ch_02/Ch02_01.asm
+#)
 
-#project(ch03_04 CXX ASM_NASM)
-add_executable(ch03_04
-        modern-x86-assembly/ch_03/Ch03_04.cpp
-        modern-x86-assembly/ch_03/Ch03_04.asm
-)
-set_target_properties(ch03_04 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch03_05
-        modern-x86-assembly/ch_03/Ch03_05.cpp
-        modern-x86-assembly/ch_03/Ch03_05.asm
-)
-set_target_properties(ch03_05 PROPERTIES LINKER_LANGUAGE CXX)
-
-# chapter 4
-# ---------
-add_executable(ch04_01
-        modern-x86-assembly/ch_04/Ch04_01.cpp
-        modern-x86-assembly/ch_04/Ch04_01.asm
-)
-set_target_properties(ch04_01 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_02
-        modern-x86-assembly/ch_04/Ch04_02.cpp
-        modern-x86-assembly/ch_04/Ch04_02.asm
-)
-set_target_properties(ch04_02 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_03
-        modern-x86-assembly/ch_04/Ch04_03.cpp
-        modern-x86-assembly/ch_04/Ch04_03.asm
-)
-set_target_properties(ch04_03 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_04
-        modern-x86-assembly/ch_04/Ch04_04.cpp
-        modern-x86-assembly/ch_04/Ch04_04.asm
-)
-set_target_properties(ch04_04 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_05
-        modern-x86-assembly/ch_04/Ch04_05.cpp
-        modern-x86-assembly/ch_04/Ch04_05.asm
-)
-set_target_properties(ch04_05 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_06
-        modern-x86-assembly/ch_04/Ch04_06.cpp
-        modern-x86-assembly/ch_04/Ch04_06.asm
-)
-set_target_properties(ch04_06 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_07
-        modern-x86-assembly/ch_04/Ch04_07.cpp
-        modern-x86-assembly/ch_04/Ch04_07.asm
-)
-set_target_properties(ch04_07 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch04_08
-        modern-x86-assembly/ch_04/Ch04_08.cpp
-        modern-x86-assembly/ch_04/Ch04_08.asm
-)
-set_target_properties(ch04_08 PROPERTIES LINKER_LANGUAGE CXX)
+add_asm_chapter_range(2 1 5) # Generates ch02_01 through ch02_05
+add_asm_chapter_range(3 1 5)  # Generates ch03_01 through ch03_05
+add_asm_chapter_range(4 1 8)  # Generates ch04_01 through ch04_08
 
 # chapter 5
 # ----------
-add_executable(ch05_01
-        modern-x86-assembly/ch_05/Ch05_01.cpp
-        modern-x86-assembly/ch_05/Ch05_01.asm
-)
-set_target_properties(ch05_01 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch05_02
-        modern-x86-assembly/ch_05/Ch05_02.cpp
-        modern-x86-assembly/ch_05/Ch05_02.asm
-)
-set_target_properties(ch05_02 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch05_03
-        modern-x86-assembly/ch_05/Ch05_03.cpp
-        modern-x86-assembly/ch_05/Ch05_03.asm
-)
-set_target_properties(ch05_03 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch05_04
-        modern-x86-assembly/ch_05/Ch05_04.cpp
-        modern-x86-assembly/ch_05/Ch05_04.asm
-)
-set_target_properties(ch05_04 PROPERTIES LINKER_LANGUAGE CXX)
+add_asm_chapter_range(5 1 4)  # Generates ch05_01 through ch05_04
 
 add_executable(ch05_05
         modern-x86-assembly/ch_05/Ch05_05.cpp
+        # these were named with `.nasm` extension to experiment with a different file type in the CLion editor
         modern-x86-assembly/ch_05/Ch05_05.nasm
         modern-x86-assembly/ch_05/cmpequ_fp.nasmh
 )
 target_include_directories(ch05_05 PRIVATE
+        # this is required so that Ch05_05.nasm can include "cmpequ_fp.nasmh"
         "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_05"
 )
 set_target_properties(ch05_05 PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(ch05_06
-        modern-x86-assembly/ch_05/Ch05_06.cpp
-        modern-x86-assembly/ch_05/Ch05_06.asm
-)
-set_target_properties(ch05_06 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch05_07
-        modern-x86-assembly/ch_05/Ch05_07.cpp
-        modern-x86-assembly/ch_05/Ch05_07.asm
-)
-target_include_directories(ch05_07 PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_05"
-)
-set_target_properties(ch05_07 PROPERTIES LINKER_LANGUAGE CXX)
-
-
-# chapter 6
+add_asm_chapter_range(5 6 7)  # Generates ch05_06 through ch05_07
 # ----------
-add_executable(ch06_05
-        modern-x86-assembly/ch_06/Ch06_05.cpp
-        modern-x86-assembly/ch_06/Ch06_05.asm
-)
-set_target_properties(ch06_05 PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(ch06_06
-        modern-x86-assembly/ch_06/Ch06_06.cpp
-        modern-x86-assembly/ch_06/Ch06_06.asm
-)
-set_target_properties(ch06_06 PROPERTIES LINKER_LANGUAGE CXX)
+add_asm_chapter_range(6 5 7)  # Generates ch06_05 through ch06_07
+add_asm_chapter_range(7 1 1)  # Generates ch07_01 through ch07_01
+add_asm_chapter_range(8 1 6)  # Generates ch08_01 through ch08_06
 
-add_executable(ch06_07
-        modern-x86-assembly/ch_06/Ch06_07.cpp
-        modern-x86-assembly/ch_06/Ch06_07.asm
-)
-set_target_properties(ch06_07 PROPERTIES LINKER_LANGUAGE CXX)
-
-# chapter 7
-# ----------
-add_executable(ch07_01
-        modern-x86-assembly/ch_07/Ch07_01.cpp
-        modern-x86-assembly/ch_07/Ch07_01.asm
-)
-set_target_properties(ch07_01 PROPERTIES LINKER_LANGUAGE CXX)
-
-# chapter 8
-# ----------
-add_executable(ch08_01
-        modern-x86-assembly/ch_08/Ch08_01.cpp
-        modern-x86-assembly/ch_08/Ch08_01.asm
-        modern-x86-assembly/ch_08/XmmVal.h
-)
-set_target_properties(ch08_01 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch08_02
-        modern-x86-assembly/ch_08/Ch08_02.cpp
-        modern-x86-assembly/ch_08/Ch08_02.asm
-)
-set_target_properties(ch08_02 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch08_03
-        modern-x86-assembly/ch_08/Ch08_03.cpp
-        modern-x86-assembly/ch_08/Ch08_03.asm
-)
-set_target_properties(ch08_03 PROPERTIES LINKER_LANGUAGE CXX)
-
-
-add_executable(ch08_04
-        modern-x86-assembly/ch_08/Ch08_04.cpp
-        modern-x86-assembly/ch_08/Ch08_04.asm
-)
-set_target_properties(ch08_04 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch08_05
-        modern-x86-assembly/ch_08/Ch08_05.cpp
-        modern-x86-assembly/ch_08/Ch08_05.asm
-)
-set_target_properties(ch08_05 PROPERTIES LINKER_LANGUAGE CXX)
-
-add_executable(ch08_06
-        modern-x86-assembly/ch_08/Ch08_06.cpp
-        modern-x86-assembly/ch_08/Ch08_06.asm
-)
-set_target_properties(ch08_06 PROPERTIES LINKER_LANGUAGE CXX)
