@@ -1,0 +1,10 @@
+
+
+1. Graphical visualization of various AVX SIMD operators
+    A. vpsrldq, shifts entire 16 byte register right by N bytes at a time, shifts in 0 from the left
+    B.
+
+2. Terminal programmer's calculator, handles hex, binary natively
+
+3. Terminal Unicode codepoint browser and utility
+

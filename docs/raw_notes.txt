@@ -240,6 +240,8 @@ Looping:
  .endfor
 
 
+Cross ISA SIMD library:
+libHighway
 
 
 

@@ -8,6 +8,14 @@ in the asm file (the extern decl in the C file is normal, witout the leading und
 Global variable names must also begin with an underscore.
 External names must be prefixed with underscore.
 
+Local Symbols
+-------------
+NASM on Mac doesn't generate sufficient dwarf debug info for stepping through asm functions.
+Specifically, there is no way to tell when a function definition is ended. So debuggers have to infer this.
+This causes problems when there are multiple return paths out of a function. To mitigate this issue,
+use local label names for jumps in a function. Local names begin with a period.
+Instead of `Loop1:` write `.Loop1:` and `jne .Loop1`, etc.
+
 Stack Alignment
 ----------------
 rsp must be 16-byte aligned for all function calls or segv.
