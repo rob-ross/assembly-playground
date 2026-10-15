@@ -1,0 +1,446 @@
+//  base.h
+//
+//  Created by Rob Ross on 2/21/26.
+//
+
+#pragma once
+#include <assert.h>
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L
+    // If not C23, include the header that provides 'bool'
+    #include <stdbool.h>
+#endif
+
+
+// 1. Check if we are in C23
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+    // 2. Check for known-good library versions
+    #if defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 39))
+        // Linux with glibc 2.39+
+        #define BOOL_FMT "%b"
+    #elif defined(__APPLE__)
+        // Currently, even macOS 15.2 doesn't reliably support %b in printf.
+        // It is safer to use %d for now.
+        #define BOOL_FMT "%d"
+    #else
+        // Fallback for unknown C23 environments
+        #define BOOL_FMT "%d"
+    #endif
+
+#else
+    // Pre-C23
+    #include <stdbool.h>
+    #define BOOL_FMT "%d"
+#endif
+
+#include <string.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+
+// ----------------------------
+// HELPER MACROS
+// ----------------------------
+
+/**
+ * @brief Generates a unique variable name token for use within a macro.
+ *
+ * It creates an identifier by concatenating a prefix, a user-provided base name,
+ * and the current line number. This is a common and portable technique to avoid
+ * name collisions for temporary variables inside macros.
+ *
+ * Example: `UNIQUE_VAR(my_temp)` on line 50 would expand to `pvt_my_temp_50`.
+ *
+ * @param base_name The root name for the variable.
+ */
+#define UNIQUE_VAR(base_name) CAT(CAT(pvt_, base_name), __LINE__)
+
+/**
+ * @brief Swaps the values of the two scalar argument variables.
+ * @param a scalar variable a
+ * @param b scalar variable b
+ */
+#define SWAP(a, b) STATEMENT(                               \
+    auto UNIQUE_VAR(swap_temp) = (a);                       \
+    (a) = (b);                                              \
+    (b) = UNIQUE_VAR(swap_temp);                            \
+)
+
+#define STATEMENT(S) do{ S }while(0)
+#define STRINGIFY_(S) #S
+#define STRINGIFY(S) STRINGIFY_(S)
+#define BOOLIFY(x) ((x) != 0)
+#define CAT_(A, B) A##B
+#define CAT(A, B) CAT_(A, B)
+#define CAT3(A,B,C) CAT(CAT(A,B), C)
+#define ARRAY_COUNT(a) (sizeof(a)/sizeof(*(a)))
+#define INT_FROM_PTR(p) (unsigned long long)((char*)p - (char*)0)
+#define PTR_FROM_INT(i) (void*)((char*)0 + (i))
+#define MEMBER(T, m) (((T*)0)->m)
+#define OFFSET_OF_MEMBER(T, m) INT_FROM_PTR(&MEMBER(T, m))
+#define MIN(a, b) (((a)<(b))?(a):(b))
+#define MAX(a, b) (((a)>(b))?(a):(b))
+#define CLAMP(a, x, b) (((x)<(a))?(a):((b)<(x))?(b):(x))
+#define CLAMP_TOP(a, b) MIN(a, b)
+#define CLAMP_BOT(a, b) MAX(a, b)
+
+#define MEM_ZERO(p, z) memset((p), 0, (z))
+#define MEM_ZERO_STRUCT(p) MEM_ZERO((p), sizeof(*(p)))
+#define MEM_ZERO_ARRAY(p) MEM_ZERO((p), sizeof(p))
+#define MEM_ZERO_TYPED(p, c) MEM_ZERO((p), sizeof(*(p)) *(c))
+#define MEM_MATCH(a, b, z)  (memcmp((a), (b), (z)) == 0 )
+#define MEM_COPY(d, s, z) memmove((d), (s), (z))
+#define MEM_COPY_STRUCT(d, s) MEM_COPY((d), (s), MIN(sizeof(*(d), sizeof(*(s)))))
+#define MEM_COPY_ARRAY(d, s) MEM_COPY((d), (s), MIN(sizeof(d), sizeof(s)))
+#define MEM_COPY_TYPED(d, s, c) MEM_COPY((d), (s), MIN(sizeof(*(d)), sizeof(*(s))) * (c) )
+
+
+// Helper to select format specifier based on type (C11)
+// remember this is a *compiler* time macro, not preprocessor
+#define IS_BOOL(x) _Generic((x), bool: 1, default: 0)
+#define IS_ARRAY(x) (!(_Generic((x), typeof(x): 0, typeof(&(x)[0]): 1, default: 0)))
+#define IS_INT_ARRAY(x) (sizeof(x) > 0 && _Generic((x), int*: 0, default: 1))  // Rough example
+
+
+#define KB(x) ((x) << 10)
+#define MB(x) ((x) << 20)
+#define GB(x) ((x) << 30)
+#define TB(x) ((U64)(x) << 40llu)
+
+#define Thousand(x) ((x)*1000)
+#define Million(x)  ((x)*1000000llu)
+#define Billion(x)  ((x)*1000000000llu)
+#define Trillion(x) ((x)*1000000000000llu)
+
+
+//// ------------------------------------------------------------
+////
+////    LINKED LISTS
+////
+//// ------------------------------------------------------------
+
+// -----------------------------------------------------------------
+//      Doubly Linked Lists
+// -----------------------------------------------------------------
+
+#define DLLPushBack_NP(FIRST,LAST,NODE,NEXT_NAME,PREV_NAME)\
+    (\
+        (FIRST)==nullptr?\
+            ( \
+                (FIRST)=(LAST)=(NODE)\
+                , \
+                (NODE)->NEXT_NAME=(NODE)->PREV_NAME=nullptr \
+            ):\
+            ( \
+                (NODE)->PREV_NAME=(LAST)\
+                    ,\
+                    (LAST)->NEXT_NAME=(NODE)\
+                    ,\
+                    (LAST)=(NODE)\
+                    ,\
+                    (NODE)->NEXT_NAME=nullptr \
+            )\
+    )
+// defaults to using 'next' and 'prev' as node member names
+#define DLLPushBack(FIRST,LAST,NODE) DLLPushBack_NP(FIRST,LAST,NODE,next,prev)
+// defaults to using 'next' and 'prev' as node member names
+#define DLLPushFront(FIRST,LAST,NODE) DLLPushBack_NP(LAST,FIRST,NODE,prev,next)
+
+#define DLLRemove_NP(FIRST,LAST,NODE,NEXT_NAME,PREV_NAME)\
+    (\
+        (FIRST)==(NODE)?\
+            (\
+                (FIRST)==(LAST)?\
+                    ( (FIRST)=(LAST)=(nullptr) ):\
+                    ( (FIRST)=(FIRST)->NEXT_NAME, (FIRST)->PREV_NAME=nullptr )\
+            )\
+            :\
+            (LAST)==(NODE)?\
+                ( (LAST)=(LAST)->PREV_NAME,(LAST)->NEXT_NAME=nullptr ):\
+                ( (NODE)->NEXT_NAME->PREV_NAME=(NODE)->PREV_NAME\
+                    ,\
+                    (NODE)->PREV_NAME->NEXT_NAME=(NODE)->NEXT_NAME )\
+    )
+
+// defaults to using 'next' and 'prev' as node member names
+#define DLLRemove(FIRST,LAST,NODE) DLLRemove_NP(FIRST,LAST,NODE,next,prev)
+
+// -----------------------------------------------------------------
+//      Singly Linked Lists
+// -----------------------------------------------------------------
+
+#define SLLQueuePush_N(FIRST,LAST,NODE,NEXT_NAME) \
+    (\
+        (\
+            (FIRST)==nullptr?\
+                (FIRST)=(LAST)=(NODE):\
+                ( (LAST)->NEXT_NAME=(NODE),(LAST)=(NODE) )\
+        )\
+        , \
+        (NODE)->NEXT_NAME=nullptr\
+    )
+// defaults to using 'next' as node member name
+#define SLLQueuePush(FIRST,LAST,NODE) SLLQueuePush_N(FIRST,LAST,NODE,next)
+#define SLLQueuePushFront_N(FIRST,LAST,NODE,NEXT_NAME)\
+    (\
+        (FIRST)==nullptr?\
+            ( (FIRST)=(LAST)=(NODE), (NODE)->NEXT_NAME=nullptr ):\
+            ( (NODE)->NEXT_NAME=(FIRST),(FIRST)=(NODE) )\
+    )
+// defaults to using 'next' as node member name
+#define SLLQueuePushFront(FIRST,LAST,NODE) SLLQueuePushFront_N(FIRST,LAST,NODE,next)
+#define SLLQueuePop_N(FIRST,LAST,NEXT_NAME)\
+    (\
+        (FIRST)==(LAST)?\
+            (FIRST)=(LAST)=nullptr:\
+            ( (FIRST)=(FIRST)->NEXT_NAME )\
+    )
+// defaults to using 'next' as node member name
+#define SLLQueuePop(FIRST,LAST) SLLQueuePop_N(FIRST,LAST,next)
+#define SLLStackPush_N(FIRST,NODE,NEXT_NAME)\
+    (\
+        (NODE)->NEXT_NAME=(FIRST), (FIRST)=(NODE)\
+    )
+// defaults to using 'next' as node member name
+#define SLLStackPush(FIRST,NODE) SLLStackPush_N(FIRST,NODE,next)
+#define SLLStackPop_N(FIRST,NEXT_NAME) \
+    (\
+        (FIRST)==nullptr?\
+            nullptr:\
+            ( (FIRST)=(FIRST)->NEXT_NAME )\
+    )
+// defaults to using 'next' as node member name
+#define SLLStackPop(FIRST) SLLStackPop_N(FIRST,next)
+
+
+// -----------------------------------------------------------------
+//      Conversion Format Specifiers  (partial)
+// -----------------------------------------------------------------
+
+
+#define CONVERSION_FMT(expr, ...) _Generic( (expr),    \
+    bool                      : "%d",                  \
+    bool*                     : "%p",                  \
+    bool const*               : "%p",                  \
+    char                      : "%hhd",                \
+    char*                     : "%p",                  \
+    char const*               : "%p",                  \
+    unsigned char             : "%hhu",                \
+    unsigned char*            : "%p",                  \
+    unsigned char const*      : "%p",                  \
+    signed char               : "%hhd",                \
+    signed char*              : "%p",                  \
+    signed char const*        : "%p",                  \
+    short                     : "%hd",                 \
+    short*                    : "%p",                  \
+    short const*              : "%p",                  \
+    unsigned short            : "%hu",                 \
+    unsigned short*           : "%p",                  \
+    unsigned short const*     : "%p",                  \
+    int                       : "%d",                  \
+    int*                      : "%p",                  \
+    int const*                : "%p",                  \
+    unsigned int              : "%u",                  \
+    unsigned int*             : "%p",                  \
+    unsigned int const*       : "%p",                  \
+    long                      : "%ld",                 \
+    long*                     : "%p",                  \
+    long const*               : "%p",                  \
+    unsigned long             : "%lu",                 \
+    unsigned long*            : "%p",                  \
+    unsigned long const*      : "%p",                  \
+    long long                 : "%lld",                \
+    long long*                : "%p",                  \
+    long long const*          : "%p",                  \
+    unsigned long long        : "%llu",                \
+    unsigned long long*       : "%p",                  \
+    unsigned long long const* : "%p",                  \
+    float                     : "%f",                  \
+    float*                    : "%p",                  \
+    float const*              : "%p",                  \
+    double                    : "%f",                  \
+    double*                   : "%p",                  \
+    double const*             : "%p",                  \
+    long double               : "%Lf",                 \
+    long double*              : "%p",                  \
+    long double const*        : "%p",                  \
+    void*                     : "%p",                  \
+    void const*               : "%p",                  \
+    default                   : "%p"                  \
+)
+
+
+// C11 _Generic selection to mimic a typeof() string for inspection
+#define TYPE_STR(expr, ...) _Generic( (expr),    \
+    bool                      : "bool",                        \
+    bool*                     : "bool*",                       \
+    bool const*               : "bool const*",                 \
+    char                      : "char",                        \
+    char*                     : "char*",                       \
+    char const*               : "char const*",                 \
+    unsigned char             : "unsigned char",               \
+    unsigned char*            : "unsigned char*",              \
+    unsigned char const*      : "unsigned char const*",        \
+    signed char               : "signed char",                 \
+    signed char*              : "signed char*",                \
+    signed char const*        : "signed char const*",          \
+    short                     : "short",                       \
+    short*                    : "short*",                      \
+    short const*              : "short const*",                \
+    unsigned short            : "unsigned short",              \
+    unsigned short*           : "unsigned short*",             \
+    unsigned short const*     : "unsigned short const*",       \
+    int                       : "int",                         \
+    int*                      : "int*",                        \
+    int const*                : "int const*",                  \
+    unsigned int              : "unsigned int",                \
+    unsigned int*             : "unsigned int*",               \
+    unsigned int const*       : "unsigned int const*",         \
+    long                      : "long",                        \
+    long*                     : "long*",                       \
+    long const*               : "long const*",                 \
+    unsigned long             : "unsigned long",               \
+    unsigned long*            : "unsigned long*",              \
+    unsigned long const*      : "unsigned long const*",        \
+    long long                 : "long long",                   \
+    long long*                : "long long*",                  \
+    long long const*          : "long long const*",            \
+    unsigned long long        : "unsigned long long",          \
+    unsigned long long*       : "unsigned long long*",         \
+    unsigned long long const* : "unsigned long long const*",   \
+    float                     : "float",                       \
+    float*                    : "float*",                      \
+    float const*              : "float const*",                \
+    double                    : "double",                      \
+    double*                   : "double*",                     \
+    double const*             : "double const*",               \
+    long double               : "long double",                 \
+    long double*              : "long double*",                \
+    long double const*        : "long double const*",          \
+    void*                     : "void*",                       \
+    void const*               : "void const*",                 \
+    default                   : "unknown"                      \
+)
+
+/**
+ * Prints a single new line
+ */
+#define PL printf("\n")
+
+/**
+ * Prints value of the argument with no newline
+ * @param x scalar value, pointer, or expression. Not tested for arrays, structs, unions, or enums
+ */
+#define PV(x) STATEMENT( \
+    printf(" %s == (%s)", #x, TYPE_STR(x)); \
+    if ( IS_BOOL(x) ){ \
+        printf( (x) == 0 ? "false" : "true");\
+    } else {    \
+        printf(CONVERSION_FMT(x), (x)); \
+    }   \
+    printf(","); \
+)
+
+/**
+ * Prints value of the argument with a newline
+ * @param x scalar value, pointer, or expression. Not tested for arrays, structs, unions, or enums
+ */
+#define PVL(x) STATEMENT( PV(x); printf("\n"); )
+
+/**
+ * Prints the argument string with a newline
+ * @param s string value
+ */
+#define PS(s) STATEMENT( printf("%s == \"%s\"\n", #s, (s) ); )
+
+
+// expands to printf( fmt, ...)  but adds a newline to the end of fmt.
+#define print(fmt, ...)                 \
+    do {                                \
+        printf((fmt), ##__VA_ARGS__);   \
+        putchar('\n');                  \
+    } while (0)
+
+
+
+/*
+ *  Temp experiments making a RAII guard or resource manager.
+ *  You acquire something, do something, then finally release the thing you acquired.
+ *  USING_FILE lets you open a file and assign a FILE*, work with the file, then close the file.
+ *  Briefly tested, but it worked. good for quick & dirty work? No robust error checking/reporting
+ *  what happens if  you try to fclose() a file that failed to fopen()?
+ *
+ *  Design: the outer loop exists only to initialize the "loop variable". Here we generate a unique identifier via
+ *  UNIQUE_VAR. It will be something like `pvt_once345`. It is initialized to 1. The condition check passes, and
+ *  the body of the loop starts, which is the second for-loop.
+ *  This inner loop will also run exactly once. In the increment section, it decrements the loop variable, making it
+ *  zero. The purpose of the inner loop is twofold.
+ *      1. It acquires the resource, here a file via fopen(). The filename and mode are passed as arguments to the function
+ *          macro. An identifier name is also passed as the first argument, which is of typed as FILE*. in the macro.
+ *          This variable is assigned the FILE* returned from fopen().
+ *      2. It releases the resource, fclose(),  in the increment section as the first operand of the comma operator.
+ *          If you wanted the return value assigned to a variable, you could pass that variable to the Macro as a fourth
+ *          argument, e.g. USING_FILE( fp, "foo.txt", "rb", close_result)...
+ *          and in the second for-loop you'd write `...; close_result = fclose(FP), ...`
+ * The second for-loop in the macro has no body, so you write one after the macro invocation like:
+        USING_FILE( fptr, filename, "rb") {
+            int saved_errno = errno;
+            if (!fptr) {
+                // handle error
+                // don't break!!! You want the loop increment section to run.
+                // ...
+            } else {
+                int c = fgetc(fptr);
+                // ...
+            }
+        };
+
+    When the block following USING_FILE() exits, the file has been closed.
+
+    Note: Clang supports expression defines , e.g.:
+        #define EXPRESSION __extension__ ({ ... foo;})
+    The value of the macro evaluates to the value of the last expression in the block, `foo` in this example.
+ */
+
+// Can't use `break` nor `continue` in the block
+#define USING_FILE( FP, name, mode)    \
+    for ( int UNIQUE_VAR(once) = 1; UNIQUE_VAR(once); )      \
+        for( FILE* FP = fopen( name, mode) ; UNIQUE_VAR(once) ; fclose(FP), FP = nullptr, UNIQUE_VAR(once)--)   \
+
+
+
+// Can't use `break` nor `continue` in the block
+#define USING_VA_LIST(args, last) \
+    for ( int UNIQUE_VAR(once) = 1 ; UNIQUE_VAR(once) ; )            \
+        for( va_list args; UNIQUE_VAR(once) ; )            \
+            for( va_start(args, last) ; UNIQUE_VAR(once) ; va_end(args), UNIQUE_VAR(once)-- )         \
+
+/*
+ *
+// Example with USING_VA_LIST():
+static void my_printf(const char * format, ...) {
+    USING_VA_LIST(args, format) {
+        for ( size_t at = 0; format[at]; at++) {
+            switch (format[at]) {
+                case 'c': {
+                    int param = va_arg(args, int);
+                    char passed = (char)param;
+                    assert(passed == 'X');
+                }
+            }
+        }
+    }
+}
+
+static void example_applied_to_va_list(void) {
+    my_printf("c", 'X');
+}
+*/
+
+#ifdef __cplusplus
+}
+#endif
