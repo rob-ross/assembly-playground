@@ -1,14 +1,13 @@
-//  ch_02_01_misc.cpp
+//  Ch02_01.cpp
 //
 //  Created by Rob Ross on 9/14/26.
 //
 
-
-//-----------------------------------------------------------------------------
-// Ch02_01_misc.cpp
-//-----------------------------------------------------------------------------
 #include <iostream>
-#include "Ch02_01.h"
+#include "roblib/allocator.h" // test that we can see this
+
+extern "C" int AddSubI32_a(int a, int b, int c, int d);
+extern void DisplayResults(int a, int b, int c, int d, int r1, int r2);
 
 void DisplayResults(int a, int b, int c, int d, int r1, int r2) {
     constexpr char nl = '\n';
@@ -22,3 +21,13 @@ void DisplayResults(int a, int b, int c, int d, int r1, int r2) {
     std::cout << nl;
 }
 
+int main() {
+    int a = 10;
+    int b = 40;
+    int c = 9;
+    int d = 6;
+    int r1 = (a + b) - (c + d) + 7;
+    int r2 = AddSubI32_a(a, b, c, d);
+    DisplayResults(a, b, c, d, r1, r2);
+    return 0;
+}
