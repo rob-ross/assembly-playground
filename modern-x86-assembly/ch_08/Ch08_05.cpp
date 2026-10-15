@@ -26,7 +26,7 @@ extern bool CalcMinMaxU8_cpp(uint8_t* x_min, uint8_t* x_max,
 extern void InitArray(uint8_t* x, size_t n, unsigned int rng_seed);
 
 // c_NumElements must be > 0 and even multiple of 16
-constexpr size_t c_NumElements = 10000000;
+constexpr size_t c_NumElements = 10'000'000;
 constexpr unsigned int c_RngSeedVal = 23;
 
 
@@ -76,6 +76,7 @@ void InitArray(uint8_t* x, size_t n, unsigned int rng_seed)
     x[n / 8 + 7] = 254;
 }
 
+#include "roblib/dev_utils.h"
 
 static void CalcMinMaxU8()
 {
@@ -90,8 +91,20 @@ static void CalcMinMaxU8()
     uint8_t x_min1 = 0, x_max1 = 0;
     uint8_t x_min2 = 0, x_max2 = 0;
 
-    bool rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n);
-    bool rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n);
+
+    bool rc0;
+    bool rc1;
+
+    TIMEIT(rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n));
+    TIMEIT(rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n));
+
+    /*
+
+        rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n)  time: 0.020041 s, rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n)  time: 0.000574 s,
+        rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n)  time: 0.020172 s, rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n)  time: 0.000535 s,
+        rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n)  time: 0.020229 s, rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n)  time: 0.000685 s,
+
+     */
 
     std::cout << "\nCalcMinMaxU8_cpp() results:\n";
     std::cout << "rc0: " << rc0 << "  x_min1: " << (int)x_min1;

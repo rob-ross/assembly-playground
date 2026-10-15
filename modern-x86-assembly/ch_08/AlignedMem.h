@@ -44,7 +44,7 @@ template <class T> class AlignedArray
 
 public:
 
-    AlignedArray(void) = delete;
+    AlignedArray() = delete;
     AlignedArray(const AlignedArray& aa) = delete;
     AlignedArray(AlignedArray&& aa) = delete;
     AlignedArray& operator = (const AlignedArray& aa) = delete;
@@ -61,8 +61,8 @@ public:
         AlignedMem::Release(m_Data);
     }
 
-    T* Data(void)               { return m_Data; }
-    size_t Size(void)           { return m_Size; }
+    T* Data()               { return m_Data; }
+    size_t Size()           { return m_Size; }
 
     void Fill(T val)
     {
