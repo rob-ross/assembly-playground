@@ -1,0 +1,29 @@
+
+
+vpadd[b|w|d|q]: signed and unsigned packed addition
+
+vpadds[b|w]:    signed addition with saturation
+
+vpaddus[b|w]:   unsigned addition with saturation
+
+
+vpmuldq: signed dword multiply, writes full product qwords to destination
+
+vpmulh[w|uw]: signed|unsigned word multiply, writes high product to destination
+
+vpmull[w|d|q]: signed word/double/quad multiply, write low product to destination
+
+vpsll[w|d|q]: packed shift left logical
+
+vpsrl[w|d|q]: packed shift right logical
+
+vpsra[w|d|q]: packed shift fight arithmetic
+
+vps[l|r]dq: packed shift left|right logical qwords
+
+vpsub[b|w|d|q]: signed/unsigned packed subtraction
+
+vpsubs[b|w]:    signed subtraction with saturation
+
+vpsubus[b|w]:   unsigned subtraction with saturation
+

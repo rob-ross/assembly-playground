@@ -64,13 +64,22 @@ System V: 1. EDI, 2. ESI, 3. EDX, 4. ECX, 5. r8, 6. r9  returns in EAX
 System V volatile registers:
 volatile: free to be clobbered, caller must save
 rdi, rsi, rax, rcx, rdx, r8-r11
+xmm0-xmm15
 
 non-volatile: function must not clobber these. I.e., must save and restore these
 rbp, rsp, rbx, r12-r15
 
 MSCV++ registers: same non-volatile as System V but MSVC++ defines rdi and rsi as non-volatile
+volatile:
+rax, rcx, rdx, r8-r11
+xmm0-xmm5
 
-useful function documentation:
+non-volatile:
+rdi, rsi, rbp, rsp, rbx, r12-r15
+xmm6-xmm15
+
+
+useful asm function documentation:
     Function name
     Input
     Output
