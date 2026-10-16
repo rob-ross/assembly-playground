@@ -95,8 +95,8 @@ static void CalcMinMaxU8()
     bool rc0;
     bool rc1;
 
-    TIMEIT(rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n));
-    TIMEIT(rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n));
+    TIMEIT_STATEMENT(rc0 = CalcMinMaxU8_cpp(&x_min1, &x_max1, x, n));
+    TIMEIT_STATEMENT(rc1 = CalcMinMaxU8_avx(&x_min2, &x_max2, x, n));
 
     /*
 
