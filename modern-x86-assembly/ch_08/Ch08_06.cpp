@@ -9,6 +9,7 @@
 #include <cstdint>
 #include "MT.h"
 #include "AlignedMem.h"
+#include "roblib/dev_utils.h"
 
 
 // Ch08_06_fasm.asm, Ch08_06_fasm.s
@@ -72,8 +73,8 @@ static void CalcMeanU8()
     uint64_t sum_x0, sum_x1;
     double mean_x0, mean_x1;
 
-    rc0 = CalcMeanU8_cpp(&mean_x0, &sum_x0, x, n);
-    rc1 = CalcMeanU8_avx(&mean_x1, &sum_x1, x, n);
+    TIMEIT_STATEMENT(rc0 = CalcMeanU8_cpp(&mean_x0, &sum_x0, x, n));
+    TIMEIT_STATEMENT(rc1 = CalcMeanU8_avx(&mean_x1, &sum_x1, x, n));
 
     std::cout << std::fixed << std::setprecision(6);
 
