@@ -117,4 +117,6 @@ add_asm_chapter_range(5 6 7)  # Generates ch05_06 through ch05_07
 add_asm_chapter_range(6 5 7)  # Generates ch06_05 through ch06_07
 add_asm_chapter_range(7 1 1)  # Generates ch07_01 through ch07_01
 add_asm_chapter_range(8 1 6)  # Generates ch08_01 through ch08_06
+add_asm_chapter_range(9 1 1)  # Generates ch08_01 through ch09_
+
 

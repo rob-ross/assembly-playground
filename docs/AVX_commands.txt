@@ -1,4 +1,17 @@
+Observations on mnemonic patterns:
+- all AVX commands start with "v"
+- packed integer ops start with "vp"
+- packed float ops put "p" after base command name. E.g.:
+    vpaddd - add packed dwords
+    vaddps - add packed SPFP
 
+- 'a' can mean : aligned
+- 'd' can mean : double-precision, double word
+- 'h' can mean : half-precisions
+- 's' can mean : scalar, single-precision, signed, (saturated?)
+- 'u' can mean : unsigned, unaligned
+- field widths use {b, w, d, q, dq, o} for byte(1,8), word(2,16), double word(4,32), quad word(8,64)
+- FP ops use {s,d,h} for single-precision, double-precision, half-precision
 
 VCVTSI2SD:  Convert Signed Doubleword or Quadword Integer to Scalar Double-Precision Floating-Point
 
