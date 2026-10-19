@@ -9,6 +9,9 @@ DPFP: double-precision floating point
 
 dq: double quadword
 
+divisor: the second operand, the operand under the div sign, the number that divides another number
+dividend: the first operand, the operand on top the div sign, the number that is being divided
+
 double word: two words, 4 bytes, 32 bits
 
 double quadword:    2 quad words, 8 words, 16 bytes, 128 bits

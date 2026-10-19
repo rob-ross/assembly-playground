@@ -67,5 +67,34 @@ _PackedMathF32_avx:
 global _PackedMathF64_avx
 _PackedMathF64_avx:
 
+    vmovapd     ymm0, [rsi]     ; ymm0 = a
+    vmovapd     ymm1, [rdx]     ; ymm1 = b
 
+    vaddpd      ymm2,  ymm0, ymm1   ; ymm2 = a + b, DP addition
+    vmovapd     [rdi], ymm2         ; save to result element
+
+    vsubpd      ymm2, ymm0, ymm1    ; ymm2 = a - b, DP subtract
+    vmovapd     [rdi+32],   ymm2
+
+    vmulpd      ymm2, ymm0, ymm1     ; ymm2 = a * b DP multiply
+    vmovapd     [rdi+64],   ymm2
+
+    vdivpd      ymm2, ymm0, ymm1    ; ymm2 = a / b, DP division
+    vmovapd     [rdi+96],   ymm2
+
+    vminpd      ymm2, ymm0, ymm1    ; ymm2 = min(a, b), DP min
+    vmovapd     [rdi+128],  ymm2
+
+    vmaxpd      ymm2, ymm0, ymm1    ; ymm2 = max(a,b), DP max
+    vmovapd     [rdi+160],  ymm2
+
+    vsqrtpd     ymm2, ymm0          ; ymm2 = sqrt(a)
+    vmovapd     [rdi+192], ymm2
+
+    ; set all DP values in ymm2 to their existing values with high bit masked off
+    vbroadcastsd    ymm3, [F64_AbsMask] ; load abs mask DP
+    vandpd          ymm2, ymm3, ymm1    ; ymm2 = abs(b), DP abs
+    vmovapd         [rdi+224],  ymm2
+
+    vzeroupper      ; clear upper YMM/ZMM bits
     ret

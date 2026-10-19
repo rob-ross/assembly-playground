@@ -117,6 +117,17 @@ add_asm_chapter_range(5 6 7)  # Generates ch05_06 through ch05_07
 add_asm_chapter_range(6 5 7)  # Generates ch06_05 through ch06_07
 add_asm_chapter_range(7 1 1)  # Generates ch07_01 through ch07_01
 add_asm_chapter_range(8 1 6)  # Generates ch08_01 through ch08_06
-add_asm_chapter_range(9 1 1)  # Generates ch08_01 through ch09_
+add_asm_chapter_range(9 1 1)  # Generates ch09_01
+# explicit target because we have to include the included asm file
+add_executable(ch09_02
+        modern-x86-assembly/ch_09/Ch09_02.cpp
+        modern-x86-assembly/ch_09/Ch09_02.asm
+        modern-x86-assembly/ch_09/cmpequ_fp.asm
+)
 
+target_include_directories(ch09_02 PRIVATE
+        # this is required so that Ch09_02.asm can include "cmpequ_fp.inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/modern-x86-assembly/ch_09"
+)
 
+add_asm_chapter_range(9 3 3)  # Generates ch09_03

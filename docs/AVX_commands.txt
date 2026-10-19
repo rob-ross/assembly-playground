@@ -8,6 +8,7 @@ Observations on mnemonic patterns:
 - 'a' can mean : aligned
 - 'd' can mean : double-precision, double word
 - 'h' can mean : half-precisions
+- 'p' can mean : packed, predicate
 - 's' can mean : scalar, single-precision, signed, (saturated?)
 - 'u' can mean : unsigned, unaligned
 - field widths use {b, w, d, q, dq, o} for byte(1,8), word(2,16), double word(4,32), quad word(8,64)

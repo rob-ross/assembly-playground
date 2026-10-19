@@ -14,15 +14,21 @@ vpmuldq: signed dword multiply, writes full product qwords to destination
 
 vpmulh[w|uw]:  signed|unsigned word multiply, writes high product to destination
 vpmull[w|d|q]: signed word/double/quad multiply, write low product to destination
+
+vpmin[s|u][b|w|d|q]:  perform packed signed|unsigned integer minimum compares
+vpmax[s|u][b|w|d|q]:  perform packed signed|unsigned integer maximum compares
+
 ```
 
 #### Packed Float
 ```text
-vaddps: add SPFP
-vsubps: subtract SPFP
-vmulps: multiply SPFP
-vdivps: divide SPFP
-vsqrtps: sqrt SPFP
+vaddp[s|d]:  add,       a + b,    SP|DP
+vsubp[s|d]:  subtract,  a - b,    SP|DP
+vmulp[s|d]:  multiply,  a * b,    SP|DP
+vdivp[s|d]:  divide,    a / b,    SP|DP
+vmaxp[s|d]:  max,       max(a,b), SF|DP
+vminp[s|d]:  min,       min(a,b), SF|DP
+vsqrtp[s|d]: sqrt,      sqrt(a),  SF|DP
 ```
 #### Scalar
 Basic double-precision and single-precision scalar floating-point arithmetic:
@@ -33,14 +39,7 @@ vmuls[d|s]
 vdivs[d|s]
 vsqrts[d|s]
 ```
-### Aggregate operations
-#### Packed
-```text
-vmaxps:  SPFP max(a,b)
-vminps:  SPFP min(a,b)
-vpmin[s|u][b|w|d|q]:  perform packed signed|unsigned integer minimum compares
-vpmax[s|u][b|w|d|q]:  perform packed signed|unsigned integer maximum compares
-```
+
 ### Bitwise compares
 #### Packed
 ```text
@@ -51,19 +50,26 @@ vpand[d|q]: bitwise & (and) of each dword|qword in the source operands
 ```
 
 ### Broadcast
-    vbroadcasts[s|d]: broadcast a scalar SP|DP FP value to multiple values in destination
+    vbroadcasts[s|d]: broadcast a scalar SP|DP FP value to multiple SP|DP values in destination
 
 ### Clearing bits
 ```text
 vzeroupper: Clears all but the lowest octword of YMM0–15/ZMM0–15 registers. XMM registers unaffected.
 vzeroall:   Clears YMM0–15/ZMM0–15 registers.
 ```
-### Compares (sets RFLAGS)
+### Compare
 
 #### Scalar
+The UCOMISS instruction differs from the COMISS instruction in that it signals a SIMD floating-point invalid operation exception (#I) only if a source operand is an SNaN. The COMISS instruction signals an invalid operation exception when a source operand is either a QNaN or SNaN.
 ```text
-vcoms[d|s]: compare two scalar fp values, set RFLAGS
+vcomis[d|s]:  ordered compare two scalar fp values, set RFLAGS
+vucomis[d|s]: unordered compare two scalar fp values, set RFLAGS
+
 vcmps[d|s]: compare two scalar fp values using a compare predicate. Sets destination to all 0|1 for false|true
+```
+#### Packed
+```text
+vcmpp[d|s]: compare two packed FP values using a compare predicate. Sets destination to all 0|1 for false|true
 ```
 ### Convert
 
@@ -81,7 +87,9 @@ vcvtss2sd:     convert single-precision fp to double fp
 
 #### Packed
 ```text
-vmovaps: move aligned single-precision fp
+vmovap[s|d]: move aligned   SP|DP floating-point values
+vmovup[s|d]: move unaligned SP|DP floating-point values
+
 vmovdqa: must be properly aligned to 16,32, or 64 based on register
 vmovdqu: unaligned packed moves
 ```
